@@ -1,0 +1,73 @@
+*,
+*:before,
+*:after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+.container {
+	max-width:80%;
+}
+
+.flex {
+	display: flex;
+}
+.f-around {
+	justify-content: space-around;
+}
+.f-column {
+	flex-direction: column;
+}
+
+.f-center {
+	justify-content: center;
+	align-items: center;
+}
+
+nav ul li {
+	list-style: none;
+	margin-bottom: 5px;
+}
+
+a,
+a:visited {
+	text-decoration: none;
+	color: rgba(0, 0, 200, 0.8);
+	border-bottom: 2px solid rgba(100,100,100,0);
+	margin-bottom: 5px;
+	transition-duration: 300ms;
+}
+a:hover {
+	border-bottom-color: rgba(100,100,100,0.8);
+}
+form {
+	align-items: center;
+	padding: 1rem;
+}
+
+label {
+	width: 80%;
+	margin-bottom: 0.7rem;
+}
+label span {
+	font-size: 0.7rem;
+	margin-bottom: 0.5rem;
+}
+label input,
+label textarea {
+	width: 100%;
+	padding-left: 15px;
+}
+
+form .btnBlock {
+	width: 100%;
+}
+.btnBlock {
+	justify-content: space-around;
+	width: 55%;
+}
+#map {
+	width: 80%;
+	height: 500px;
+}

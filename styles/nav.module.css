@@ -1,0 +1,7 @@
+.navUl ul {
+	justify-content: flex-end;
+	margin-bottom: 1rem;
+}
+.navUl ul li {
+	margin-left: 2rem;
+}

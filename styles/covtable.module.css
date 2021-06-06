@@ -1,0 +1,25 @@
+.covTable {
+	width: 80%;
+}
+.covTable tr {
+	cursor: pointer;
+	transition-duration: 300ms;
+}
+.covTable tr:nth-child(even) {
+	background-color: rgba(0, 150, 50, 0.5);
+}
+.covTable tr:nth-child(odd) {
+	background-color: rgba(0, 50, 150, 0.5);
+}
+.covTable tr:hover {
+	background-color: rgba(50, 50, 50, 0.7);
+}
+.covTable tr td,
+.covTable tr th {
+	padding: 0.5rem 0;
+	text-align: center;
+}
+.tabHeader td {
+	background-color: rgba(100, 10, 20, 0.5);
+	pointer-event: none;
+}

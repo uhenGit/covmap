@@ -1,0 +1,8 @@
+.topBlock {
+	display: flex;
+	justify-content: space-between;
+}
+.topBlock div,
+.topBlock div a {
+	margin: 1rem;
+}

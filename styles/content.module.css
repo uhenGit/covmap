@@ -1,0 +1,22 @@
+.tabLabel {
+	display: block;
+	border: 2px solid rgba(0,230,0,0.4);
+	background-color: rgba(0,0,0,0.3);
+	cursor: pointer;
+	transition-duration: 200ms;
+}
+.tabLabel span {
+	display: block;
+	width: 100%;
+}
+.tabInput {
+	display: none;
+}
+.active {
+	background-color: rgba(0,230,0,0.4);
+	width: 85%;
+}
+.active,
+.tabLabel:hover {
+	border-color: rgb(169, 169, 169);
+}

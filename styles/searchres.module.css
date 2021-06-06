@@ -1,0 +1,18 @@
+.listWrap {
+	width: 80%;
+	max-height: 200px;
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+	border: 1px solid rgb(100,100,100);
+}
+.listWrap li {
+	margin: 0;
+	cursor: pointer;
+	list-style: none;
+	padding: 1rem;
+	transition-duration: 200ms;
+}
+.listWrap li:hover {
+	background-color: rgba(10,50,200,0.7);
+}
