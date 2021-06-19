@@ -3,7 +3,8 @@ import Country from '../store/countryStore.js';
 
 const ListItem = observer((props) => {
 	const getItem = () => {
-		Country.getCountry(props.item.countryCode);
+		console.log('clicked item: ',props.item);
+		Country.setCountry(props.item);
 		Country.dropCountryName();
 	}
 	return (

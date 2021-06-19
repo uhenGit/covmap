@@ -12,13 +12,13 @@ const TableData = observer(() => {
 		let siblings = toJS(Country.siblings);
 		let covData = Cov.getData();
 		let countryName = geoData.countryName.split(' ').join('-');
-		let continentName = geoData.continentName;
 		if (covData.length > 0) {
 			const covEl = covData.find(covEl => covEl.country.toLowerCase() === countryName.toLowerCase());
 			if (covEl) {
 				population = covEl.population;
 				cases = covEl.cases.new;
 				const country = covEl.country;
+				const continentName = covEl.continent;
 				const data = [{continentName, country, population, cases}];
 				countryTr = <Content data={data} />;
 			} else {
@@ -39,11 +39,13 @@ const TableData = observer(() => {
 					})
 				}
 				siblingsTr = <Content data={itemsArr}/>
+			} else {
+				console.log(Country.error);
 			}
 		}
 	};
 	if (toJS(Country.getState()) === 'error') {
-		countryTr = content(toJS(Country.getError()))
+		countryTr = <Content data={(toJS(Country.getError()))} />
 	};
 	return (countryTr !== undefined ?
 		<table className={TableStyle.covTable}>

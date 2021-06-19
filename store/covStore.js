@@ -14,8 +14,17 @@ class Cov {
 	getData() {
 		return toJS(this.covData);
 	}
+	getState() {	
+		return toJS(this.state)
+	}
+	getError() {
+		return toJS(this.error)
+	}
 	getDataByDay() {
 		return toJS(this.covDataByDay);
+	}
+	dropDataByDay() {
+		runInAction(() => {this.covDataByDay.clear()})
 	}
 	async getCovData() {
 		this.inProcess('processing');
@@ -47,8 +56,16 @@ class Cov {
 				}
 			});
 			const data = await res.json();
-			runInAction(() => {this.covDataByDay.replace(data.response)});
-			this.inProcess('done');
+			if (data.response.length !== 0) {
+				runInAction(() => {this.covDataByDay.replace(data.response)});
+				this.inProcess('done');
+			} else {
+				console.log(data);
+				// get country from parameters and throw to Lidate
+				let err = 'No cov data. Maybe You want to see future';
+				runInAction(() => {this.error.set(err)});
+				this.inProcess('error');
+			}
 		}
 		catch (err) {
 			runInAction(() => {this.error.set(err)})

@@ -12,17 +12,9 @@ class Country {
 		runInAction(() => {this.state.set(status)})
 	}
 	getGeoData() {return toJS(this.currentCountryGeoData.get())};
+	getCountryName() {return this.countryName};
 	getState() {return this.state.get()};
 	getError() {return this.error.get()};
-	// clear geo data
-	/*dropCurrentGeoData() {
-		this.currentCountryGeoData.clear();
-		for (let currKey in this.currentCountryGeoData) {
-			if (this.currentCountryGeoData.hasOwnProperty(currKey)) {
-				delete this.currentCountryGeoData[currKey]
-			}
-		}
-	}*/
 	// clear siblings array
 	dropCountryName() {
 		runInAction(() => {this.countryName.clear()});
@@ -41,7 +33,7 @@ class Country {
 			const res = await fetch(`http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=uhen&style=full`);
 			const data = await res.json();
 			if (data.geonames.length !== 0) {
-				this.getCountry(data.geonames[0].countryCode)
+				this.setCountry(data.geonames[0])
 			} else {
 				runInAction(() => {this.error.set({ msg: `I've no idea where are You now` })});
 				this.inProcess('error');
@@ -52,19 +44,12 @@ class Country {
 			this.inProcess('error');
 		}
 	};
-	async getCountry(code) {
-		this.inProcess('processing...');
+	setCountry(item) {
+		item = toJS(item);
+		console.log(item);
 		try {
-			const res = await fetch(`http://api.geonames.org/countryInfoJSON?country=${code}&username=uhen&style=full`);
-			const data = await res.json();
-			if (data.geonames.length !== 0) {
-				this.getSiblings(data.geonames[0].geonameId);
-				runInAction(() => {this.currentCountryGeoData.set(data.geonames[0]);
-				this.inProcess('done');})
-			} else {
-				runInAction(() => {this.error.set({ msg: 'There is no geo data' })});
-				this.inProcess('error');
-			}
+			this.getSiblings(item.countryId);
+			runInAction(() => {this.currentCountryGeoData.set(item)})
 		}
 		catch (err) {
 			runInAction(() => {this.error.set(err)});
@@ -76,8 +61,13 @@ class Country {
 		try {
 			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${id}&username=uhen&style=full`);
 			const data = await res.json();
-			runInAction(() => {this.siblings.replace(data.geonames)});
-			this.inProcess('done');
+			if (data.geonames.length > 0) {
+				runInAction(() => {this.siblings.replace(data.geonames)});
+				this.inProcess('done');
+			} else {
+				inProcess('error');
+				runInAction(() => {this.error.set(data)});
+			}
 		}
 		catch (err) {
 			runInAction(() => {this.error.set(err)});

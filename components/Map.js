@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 
 const MapWrap = () => {
 	const Map = dynamic(
-		() => import('./Cabinet.js'),
+		() => import('./Covmap.js'),
 		{ ssr: false }
 	)
 	return <Map />

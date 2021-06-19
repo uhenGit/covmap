@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { toJS } from 'mobx';
+// import { toJS } from 'mobx';
 import Table from './Table.js';
 import MapWrap from './Map.js';
 import Graph from './Graph.js';
@@ -24,7 +24,7 @@ const Content = observer(() => {
 	const mapStyle = `${contentStyle.tabLabel} ${activeMap}`;
 	const activeGraph = (activeTab === 'graph') ? `${contentStyle.active}` : '';
 	const graphStyle = `${contentStyle.tabLabel} ${activeGraph}`;
-	// if (Country.state !== 'done') return (<h3>Loading</h3>)
+	if (Country.state === 'processing...') return (<h3>Loading...</h3>)
 	return (
 		<main>
 			<div className='flex tabs'>

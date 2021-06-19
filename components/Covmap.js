@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
-import { toJS } from 'mobx';
-import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
+// import { toJS } from 'mobx';
+// import { observer } from 'mobx-react-lite';
 import L from 'leaflet';
 import Country from '../store/countryStore.js';
 
-const Cabinet = () => {
+const Covmap = () => {
 	let coords = [];
 	useEffect(() => {
-		if (Country.state === 'done') {
-			let data = toJS(Country.currentCountryGeoData);
-			coords.push(data.lat);
-			coords.push(data.lng);
+		console.log(Country.currentCountryGeoData);
+		if (Country.getState() === 'done') {
+			// let data = toJS(Country.currentCountryGeoData);
+			coords.push(Country.getGeoData().lat);
+			coords.push(Country.getGeoData().lng);
 		} else {
 			coords.push(48.45);
 			coords.push(34.93);
@@ -26,8 +27,8 @@ const Cabinet = () => {
 		}).addTo(myMap);}, []);
 	return (
 		<div>
-			<h2>Cabinet</h2>
+			<h2>CovMap</h2>
 			<div id='map'></div>
 		</div>)
 };
-export default Cabinet;
+export default Covmap;
