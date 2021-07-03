@@ -9,7 +9,7 @@ const TableData = observer(() => {
 	let population, cases, countryTr, siblingsTr, itemsArr = [];
 	let geoData = Country.getGeoData();
 	if (Object.keys(geoData).length > 0) {
-		let siblings = toJS(Country.siblings);
+		let siblings = Country.getAllSiblings();
 		let covData = Cov.getData();
 		let countryName = geoData.countryName.split(' ').join('-');
 		if (covData.length > 0) {
@@ -24,7 +24,7 @@ const TableData = observer(() => {
 			} else {
 				countryTr = <Content data={{error: true, msg: `There's no virus data for the ${countryName} location`}} />
 			}
-			if (siblings.length > 0) {
+			if (siblings.length !== 0) {
 				for (let sibItem of siblings) {
 					covData.forEach(covItem => {
 						if (covItem.country.toLowerCase() === sibItem.countryName.toLowerCase()) {
@@ -40,7 +40,8 @@ const TableData = observer(() => {
 				}
 				siblingsTr = <Content data={itemsArr}/>
 			} else {
-				console.log(Country.error);
+				console.log(siblings);
+				console.log(toJS(Country.error));
 			}
 		}
 	};

@@ -1,4 +1,9 @@
 import { toJS, observable, runInAction } from 'mobx';
+// import config from 'config';
+// import dotenv from 'dotenv';
+
+// const key = config.get('tokens.cov_api_key');
+//dotenv.config();
 
 class Cov {
 	constructor() {
@@ -24,7 +29,10 @@ class Cov {
 		return toJS(this.covDataByDay);
 	}
 	dropDataByDay() {
-		runInAction(() => {this.covDataByDay.clear()})
+		runInAction(() => {
+			this.covDataByDay.clear()
+			this.inProcess('done')
+		})
 	}
 	async getCovData() {
 		this.inProcess('processing');
@@ -60,8 +68,6 @@ class Cov {
 				runInAction(() => {this.covDataByDay.replace(data.response)});
 				this.inProcess('done');
 			} else {
-				console.log(data);
-				// get country from parameters and throw to Lidate
 				let err = 'No cov data. Maybe You want to see future';
 				runInAction(() => {this.error.set(err)});
 				this.inProcess('error');

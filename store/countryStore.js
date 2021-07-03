@@ -1,5 +1,7 @@
 import { toJS, observable, runInAction } from 'mobx';
 
+import { GEO_DATA_USERNAME } from '../keys.js';
+
 class Country {
 	constructor() {
 		this.currentCountryGeoData = observable.box({});
@@ -15,6 +17,7 @@ class Country {
 	getCountryName() {return this.countryName};
 	getState() {return this.state.get()};
 	getError() {return this.error.get()};
+	getAllSiblings() {return toJS(this.siblings)};
 	// clear siblings array
 	dropCountryName() {
 		runInAction(() => {this.countryName.clear()});
@@ -30,7 +33,7 @@ class Country {
 	async getCountryId(lat, lon) {
 		this.inProcess('processing...');
 		try {
-			const res = await fetch(`http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=uhen&style=full`);
+			const res = await fetch(`http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=${GEO_DATA_USERNAME}&style=full`);
 			const data = await res.json();
 			if (data.geonames.length !== 0) {
 				this.setCountry(data.geonames[0])
@@ -46,7 +49,6 @@ class Country {
 	};
 	setCountry(item) {
 		item = toJS(item);
-		console.log(item);
 		try {
 			this.getSiblings(item.countryId);
 			runInAction(() => {this.currentCountryGeoData.set(item)})
