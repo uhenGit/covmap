@@ -13,13 +13,13 @@ const Search = observer(()=>{
 		setSearchStr(e.target.value);
 		// Country.dropCurrentGeoData();
 		if (searchStr.length > 1) {
-			Country.getCountryName(searchStr)
+			Country.searchCountry(searchStr)
 		}
 	};
 	return (
 		<>
 			<PureInput inputType='text' name='Search Your Country' placeholder='start typing' inputName='search' val={searchStr} inputFunc={inputHandle} />
-			{(toJS(Country.countryName).length > 0 && searchStr.length > 0) ? <SearchResult /> : null}
+			{(Country.getCountryName().length > 0 && searchStr.length > 0) ? <SearchResult /> : null}
 		</>
 	)
 })

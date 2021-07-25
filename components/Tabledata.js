@@ -40,8 +40,9 @@ const TableData = observer(() => {
 				}
 				siblingsTr = <Content data={itemsArr}/>
 			} else {
-				console.log(siblings);
-				console.log(toJS(Country.error));
+				siblingsTr = <Content data={{error: true, msg: `${countryName} has no land borders`}} />
+				// console.log(siblings);
+				// console.log(toJS(Country.error));
 			}
 		}
 	};

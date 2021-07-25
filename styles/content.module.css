@@ -4,6 +4,9 @@
 	background-color: rgba(0,0,0,0.3);
 	cursor: pointer;
 	transition-duration: 200ms;
+	position: relative;
+	top: 0;
+	left: 0;
 }
 .tabLabel span {
 	display: block;
@@ -12,6 +15,28 @@
 	font-family: sans-serif;
 	text-align: center;
 	padding-top: 5px;
+}
+.tabLabel::before {
+	content: '';
+	background-size: 25px 25px;
+	background-repeat: no-repeat;
+	width: 25px;
+	height: 25px;
+	display: inline-block;
+	position: absolute;
+	top: 20%;
+}
+.tabLabel:first-child::before {
+	background-image: url('../public/img/frequency.svg');
+	left: 31%;
+}
+.tabLabel:nth-child(2)::before {
+	background-image: url('../public/img/location.svg');
+	left: 34%;
+}
+.tabLabel:last-child::before {
+	background-image: url('../public/img/graph.svg');
+	left: 23%;
 }
 .tabInput {
 	display: none;

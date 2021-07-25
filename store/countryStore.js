@@ -27,7 +27,7 @@ class Country {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition((pos) => {
 				this.getCountryId(pos.coords.latitude, pos.coords.longitude);
-			})
+			}, () => this.getCountryId(48.45, 34.93))
 		}
 	}
 	async getCountryId(lat, lon) {
@@ -63,20 +63,15 @@ class Country {
 		try {
 			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${id}&username=uhen&style=full`);
 			const data = await res.json();
-			if (data.geonames.length > 0) {
-				runInAction(() => {this.siblings.replace(data.geonames)});
-				this.inProcess('done');
-			} else {
-				inProcess('error');
-				runInAction(() => {this.error.set(data)});
-			}
+			runInAction(() => {this.siblings.replace(data.geonames)});
+			this.inProcess('done');
 		}
 		catch (err) {
 			runInAction(() => {this.error.set(err)});
 			this.inProcess('error');
 		}
 	};
-	async getCountryName(char) {
+	async searchCountry(char) {
 		this.inProcess('processing...');
 		try {
 			const res = await fetch(`http://api.geonames.org/searchJSON?name_startsWith=${char}&fcode=PCLI&username=uhen`);

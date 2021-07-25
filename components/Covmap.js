@@ -1,6 +1,4 @@
 import { useEffect } from 'react';
-// import { mapCovData } from '../public/scripts/helpers.js';
-// import { observer } from 'mobx-react-lite';
 import L from 'leaflet';
 import Country from '../store/countryStore.js';
 import Cov from '../store/covStore.js';
@@ -15,7 +13,6 @@ const Covmap = () => {
 			coords.push(48.45);
 			coords.push(34.93);
 		}
-		// console.log('helper: ',mapCovData(Country.getGeoData().countryName));
 		console.log('siblings country: ',Country.getAllSiblings());
 		console.log('cov data: ',Cov.getData());
 		const myMap = L.map('map').setView(coords, 4);
@@ -31,8 +28,6 @@ const Covmap = () => {
 		const covData = Cov.getData();
 		const currentCovData = covData.find(covItem => covItem.country.toLowerCase() === mainData.countryName.toLowerCase());
 		const col = currentCovData.cases.total*15/currentCovData.population;
-		/*const currentDataRadius = mainData.population/15;
-		console.log(mainData);*/
 		const covContent = `<b>${currentCovData.country}</b><br />Population: ${currentCovData.population}<br /> Cases (new): ${currentCovData.cases.total} (${currentCovData.cases.new})<br /> Total recovered: ${currentCovData.cases.recovered}`
 		L.circle(coords,{radius: 250000, color: `rgba(200,20,20,${col})`}).bindTooltip('Click for detales').bindPopup(covContent).addTo(myMap);
 		Country.getAllSiblings().forEach(item => {
@@ -44,7 +39,7 @@ const Covmap = () => {
 		})}, []);
 	return (
 		<div>
-			<h2>CovMap</h2>
+			<h2>Map</h2>
 			<div id='map'></div>
 		</div>)
 };

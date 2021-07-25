@@ -14,7 +14,7 @@ const Content = observer(() => {
 		Country.getCurrentCoords();
 	}, []);
 	const [activeTab, setActiveTab] = useState('table');
-	const [coValue, setCoValue] = useState([]);
+	// const [coValue, setCoValue] = useState([]);
 	const handleInput = e => {
 		setActiveTab(e.target.value);
 	};

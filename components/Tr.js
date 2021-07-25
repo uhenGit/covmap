@@ -7,6 +7,7 @@ const Content = (props) => {
 		User.toggleShow();
 		User.setDetales(e);
 	};
+	console.log(Country.getAllSiblings());
 	if ((Country.getState() === 'error') || props.data.error) {
 		return (<tr><td colSpan='4'>{props.data.msg}</td></tr>);
 	} else {
