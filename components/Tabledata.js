@@ -1,12 +1,12 @@
-import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import Content from './Tr.js';
 import TableStyle from '../styles/covtable.module.css';
 import Country from '../store/countryStore.js';
 import Cov from '../store/covStore.js';
+import sibCovArr from '../store/covInSib';
 
 const TableData = observer(() => {
-	let population, cases, countryTr, siblingsTr, itemsArr = [];
+	let countryTr, siblingsTr, itemsArr = [];
 	let geoData = Country.getGeoData();
 	if (Object.keys(geoData).length > 0) {
 		let siblings = Country.getAllSiblings();
@@ -14,41 +14,33 @@ const TableData = observer(() => {
 		let countryName = geoData.countryName.split(' ').join('-');
 		if (covData.length > 0) {
 			const covEl = covData.find(covEl => covEl.country.toLowerCase() === countryName.toLowerCase());
+			if (Country.getState() === 'processing...') {
+				countryTr = <Content data={{fetching: true, msg: 'Fetching data...'}} />;
+			}
 			if (covEl) {
-				population = covEl.population;
-				cases = covEl.cases.new;
-				const country = covEl.country;
-				const continentName = covEl.continent;
-				const data = [{continentName, country, population, cases}];
+				const data = [{
+					continentName: covEl.continent, 
+					country: covEl.country, 
+					population: covEl.population, 
+					cases: covEl.cases
+				}];
 				countryTr = <Content data={data} />;
 			} else {
 				countryTr = <Content data={{error: true, msg: `There's no virus data for the ${countryName} location`}} />
 			}
 			if (siblings.length !== 0) {
-				for (let sibItem of siblings) {
-					covData.forEach(covItem => {
-						if (covItem.country.toLowerCase() === sibItem.countryName.toLowerCase()) {
-							let itemObj = {
-								continentName: sibItem.continentCode,
-								country: covItem.country,
-								population: covItem.population,
-								cases: covItem.cases.new
-							};
-							itemsArr.push(itemObj);
-						}
-					})
-				}
-				siblingsTr = <Content data={itemsArr}/>
+				itemsArr = sibCovArr()
+				siblingsTr = <Content data={itemsArr} sibs={siblings}/>
+			} else if (siblings.length === 0 && Country.getState() === 'processing...') {
+				siblingsTr = <Content data={{fetching: true, msg: 'Fetching data...'}} />
 			} else {
 				siblingsTr = <Content data={{error: true, msg: `${countryName} has no land borders`}} />
-				// console.log(siblings);
-				// console.log(toJS(Country.error));
 			}
 		}
 	};
-	if (toJS(Country.getState()) === 'error') {
-		countryTr = <Content data={(toJS(Country.getError()))} />
-	};
+	if (Country.getState() === 'error') {
+		countryTr = <Content data={Country.getError()} />
+	};	
 	return (countryTr !== undefined ?
 		<table className={TableStyle.covTable}>
 			<thead>

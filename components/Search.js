@@ -18,7 +18,7 @@ const Search = observer(()=>{
 	};
 	return (
 		<>
-			<PureInput inputType='text' name='Search Your Country' placeholder='start typing' inputName='search' val={searchStr} inputFunc={inputHandle} />
+			<PureInput inputType='text' name='Find Your Country' placeholder='start typing here...' inputName='search' val={searchStr} inputFunc={inputHandle} />
 			{(Country.getCountryName().length > 0 && searchStr.length > 0) ? <SearchResult /> : null}
 		</>
 	)

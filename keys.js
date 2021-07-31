@@ -1,1 +1,3 @@
-export const GEO_DATA_USERNAME = 'uhen';
+export const MAP_TOKEN='pk.eyJ1IjoidWhlbiIsImEiOiJja25zcDZoN2gyangzMnFueHlybm9heTV2In0.AhZrjp1alacLiSgt_jAh9A';
+export const GEO_DATA_USERNAME='uhen';
+export const COV_API_KEY='c67b6ad2bamsh89144d732b71fdbp17bbf0jsn23c79345dd6f';

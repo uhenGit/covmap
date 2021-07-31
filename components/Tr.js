@@ -7,17 +7,33 @@ const Content = (props) => {
 		User.toggleShow();
 		User.setDetales(e);
 	};
-	console.log(Country.getAllSiblings());
-	if ((Country.getState() === 'error') || props.data.error) {
+	function setToMain(i) {
+		let alterName;
+		switch (i) {
+			case 'USA':
+				alterName = 'United States'
+				break;
+		
+			default:
+				alterName = 'china'
+				break;
+		}
+		props.sibs.forEach(el => {
+			if (el.countryName.toLowerCase() === i.toLowerCase() || el.countryName.toLowerCase() === alterName.toLowerCase()) {
+				Country.setCountry(el)
+			}
+		});
+	}
+	if (props.data.fetching || props.data.error) {
 		return (<tr><td colSpan='4'>{props.data.msg}</td></tr>);
 	} else {
 		return (props.data.map(item => {
 			return (
-			<tr key={item.country} onClick={() => showDetales(item.country)} title='Click for Detales'>
+			<tr key={item.country}>
 				<td>{item.continentName}</td>
-				<td>{item.country}</td>
+				<td onClick={() => setToMain(item.country)} title='Click to push the Country on top'>{item.country}</td>
 				<td>{item.population}</td>
-				<td>{item.cases}</td>	
+				<td onClick={() => showDetales(item.country)} title='Click for Detales'>{item.cases.new}</td>	
 			</tr>)
 		})
 	)};

@@ -15,14 +15,15 @@ class Country {
 	}
 	getGeoData() {return toJS(this.currentCountryGeoData.get())};
 	getCountryName() {return this.countryName};
-	getState() {return this.state.get()};
-	getError() {return this.error.get()};
+	getState() {return toJS(this.state.get())};
+	getError() {return toJS(this.error.get())};
 	getAllSiblings() {return toJS(this.siblings)};
 	// clear siblings array
 	dropCountryName() {
 		runInAction(() => {this.countryName.clear()});
 	}
 	// if navigator.geolocation
+	// if nav does not allow -> uses second parameter of getCurrentPosition()
 	getCurrentCoords() {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition((pos) => {
@@ -36,7 +37,8 @@ class Country {
 			const res = await fetch(`http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=${GEO_DATA_USERNAME}&style=full`);
 			const data = await res.json();
 			if (data.geonames.length !== 0) {
-				this.setCountry(data.geonames[0])
+				this.setCountry(data.geonames[0]);
+				this.inProcess('done');
 			} else {
 				runInAction(() => {this.error.set({ msg: `I've no idea where are You now` })});
 				this.inProcess('error');
@@ -61,7 +63,7 @@ class Country {
 	async getSiblings(id) {
 		this.inProcess('processing...');
 		try {
-			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${id}&username=uhen&style=full`);
+			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${id}&username=${GEO_DATA_USERNAME}&style=full`);
 			const data = await res.json();
 			runInAction(() => {this.siblings.replace(data.geonames)});
 			this.inProcess('done');
@@ -74,7 +76,7 @@ class Country {
 	async searchCountry(char) {
 		this.inProcess('processing...');
 		try {
-			const res = await fetch(`http://api.geonames.org/searchJSON?name_startsWith=${char}&fcode=PCLI&username=uhen`);
+			const res = await fetch(`http://api.geonames.org/searchJSON?name_startsWith=${char}&fcode=PCLI&username=${GEO_DATA_USERNAME}`);
 			const data = await res.json();
 			runInAction(() => {this.countryName.replace(data.geonames)});
 			this.inProcess('done');

@@ -2,6 +2,20 @@ import { useEffect } from 'react';
 import L from 'leaflet';
 import Country from '../store/countryStore.js';
 import Cov from '../store/covStore.js';
+import sibCovArr from '../store/covInSib.js';
+
+const mapContent = (el, layer, coords = []) => {
+	let radius = 250000;
+	if (coords.length === 0) {
+		coords.push(el.lat);
+		coords.push(el.lng);
+		radius = 10000*Math.abs(Math.abs(el.bbox.east)-Math.abs(el.bbox.west));
+	}
+	const borderColor = Number(el.cases.new)*20000/Number(el.population);
+	const color = Number(el.cases.new) < 100 ? 'rgb(250,180,10)' : `rgba(230,10,10,${borderColor})`
+	const content = `<b>${el.country}</b><br />Population: ${el.population}<br />Cases (new): ${el.cases.total} (${el.cases.new})<br />Total recovered: ${el.cases.recovered}`;
+	L.circle(coords, {radius, color}).bindTooltip('Click for detales').bindPopup(content).addTo(layer);
+}
 
 const Covmap = () => {
 	let coords = [];
@@ -13,8 +27,6 @@ const Covmap = () => {
 			coords.push(48.45);
 			coords.push(34.93);
 		}
-		console.log('siblings country: ',Country.getAllSiblings());
-		console.log('cov data: ',Cov.getData());
 		const myMap = L.map('map').setView(coords, 4);
 		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -27,18 +39,12 @@ const Covmap = () => {
 		const mainData = Country.getGeoData();
 		const covData = Cov.getData();
 		const currentCovData = covData.find(covItem => covItem.country.toLowerCase() === mainData.countryName.toLowerCase());
-		const col = currentCovData.cases.total*15/currentCovData.population;
-		const covContent = `<b>${currentCovData.country}</b><br />Population: ${currentCovData.population}<br /> Cases (new): ${currentCovData.cases.total} (${currentCovData.cases.new})<br /> Total recovered: ${currentCovData.cases.recovered}`
-		L.circle(coords,{radius: 250000, color: `rgba(200,20,20,${col})`}).bindTooltip('Click for detales').bindPopup(covContent).addTo(myMap);
-		Country.getAllSiblings().forEach(item => {
-			const sibCovData = covData.find(sibCovItem => sibCovItem.country.toLowerCase() === item.countryName.toLowerCase());
-			const sibCol = sibCovData.cases.total*15/sibCovData.population;
-			const dataRadius = 10000*Math.abs(Math.abs(item.bbox.east)-Math.abs(item.bbox.west))
-			const sibCovContent = `<b>${sibCovData.country}</b><br/>Population: ${sibCovData.population}<br/>Cases (new): ${sibCovData.cases.total} (${sibCovData.cases.new})<br/>Total recovered: ${sibCovData.cases.recovered}`;
-			L.circle([item.lat, item.lng], {radius: dataRadius, color: `rgba(230,10,10,${sibCol})`}).bindTooltip('Click for detales').bindPopup(sibCovContent).addTo(myMap)
+		mapContent(currentCovData, myMap, coords)
+		sibCovArr().forEach(item => {
+			mapContent(item, myMap);
 		})}, []);
 	return (
-		<div>
+		<div className='flex f-center f-column'>
 			<h2>Map</h2>
 			<div id='map'></div>
 		</div>)

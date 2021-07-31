@@ -1,9 +1,5 @@
 import { toJS, observable, runInAction } from 'mobx';
-// import config from 'config';
-// import dotenv from 'dotenv';
-
-// const key = config.get('tokens.cov_api_key');
-//dotenv.config();
+import {COV_API_KEY} from '../keys.js';
 
 class Cov {
 	constructor() {
@@ -16,18 +12,10 @@ class Cov {
 	inProcess(status) {
 		runInAction(() => {this.state.set(status)})
 	}
-	getData() {
-		return toJS(this.covData);
-	}
-	getState() {	
-		return toJS(this.state)
-	}
-	getError() {
-		return toJS(this.error)
-	}
-	getDataByDay() {
-		return toJS(this.covDataByDay);
-	}
+	getData() { return toJS(this.covData) }
+	getState() { return toJS(this.state) }
+	getError() { return toJS(this.error) }
+	getDataByDay() { return toJS(this.covDataByDay) }
 	dropDataByDay() {
 		runInAction(() => {
 			this.covDataByDay.clear()
@@ -41,7 +29,7 @@ class Cov {
 				"method": "GET",
 				"headers": {
 					"x-rapidapi-host": "covid-193.p.rapidapi.com",
-					"x-rapidapi-key": "c67b6ad2bamsh89144d732b71fdbp17bbf0jsn23c79345dd6f"
+					"x-rapidapi-key": COV_API_KEY
 				}
 			});
 			const data = await res.json();
@@ -59,7 +47,7 @@ class Cov {
 			const res = await fetch(`https://covid-193.p.rapidapi.com/history?country=${c}&day=${d}`, {
 				"method": "GET",
 				"headers": {
-					"x-rapidapi-key": "c67b6ad2bamsh89144d732b71fdbp17bbf0jsn23c79345dd6f",
+					"x-rapidapi-key": COV_API_KEY,
 					"x-rapidapi-host": "covid-193.p.rapidapi.com"
 				}
 			});

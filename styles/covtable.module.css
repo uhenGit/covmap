@@ -21,5 +21,8 @@
 }
 .tabHeader td {
 	background-color: rgba(100, 10, 20, 0.5);
-	pointer-event: none;
+}
+.covTable thead,
+.tabHeader td {
+	pointer-events: none;
 }

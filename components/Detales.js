@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { autorun } from 'mobx';
+import {observer} from 'mobx-react-lite';
 import LiDate from './Lidate.js';
 import Cov from '../store/covStore.js';
 import User from '../store/userStore.js';
 import DetalesStyle from '../styles/detales.module.css';
 
-const Detales = () => {
+const Detales = observer(() => {
 	const [detales, setDetales] = useState({});
 	useEffect(() => autorun(() => {
 		if (User.getDetales() !== '' && !Cov.getDataByDay()[0]) {
@@ -20,26 +21,29 @@ const Detales = () => {
 		User.toggleShow();
 		Cov.dropDataByDay();
 	}
-	function setCovDate() {
-		Cov.getCovDataByDay(detales.country, detales.day);
-	}
 	let innerStyle = detales ? `${DetalesStyle.inner} ${DetalesStyle.active}` : `${DetalesStyle.inner}`;
 	let content;
 	if (detales && detales.cases) {
 		content = <ul>
-					<li><span>Country</span><span>{detales.country}</span></li>
-					<LiDate detales={detales} />
-					<li><span>Population</span><span>{detales.population}</span></li>
-					<li><span>New Cases</span><span>{detales.cases.new}</span></li>
+					<LiDate detales={{span: 'Country', info: detales.country, simpleLi: true}}/>
+					<LiDate detales={{detales, inter: false, simpleLi: false}} />
+					<LiDate detales={{span: 'Population', info: detales.population, simpleLi: true}}/>
+					<LiDate detales={{span: 'New Cases', info: detales.cases.new, simpleLi: true}}/>
 				</ul>
 		}
-	if (Cov.getState() === 'error') return (
-		<div className={DetalesStyle.outer}>
-			<div className={innerStyle}>
-				<button onClick={toggle}>Close</button>
-				<h3>{Cov.getError()}</h3>
-			</div>
-		</div>)
+	if (Cov.getState() === 'error') {
+		content = <ul>
+					<LiDate detales={{detales, inter: true, simpleLi: false}}/>
+				</ul>
+		return (
+			<div className={DetalesStyle.outer}>
+				<div className={innerStyle}>
+					<button onClick={toggle}>Close</button>
+					<h3 className='flex f-center f-column'>{Cov.getError()}</h3>
+					{content}
+				</div>
+			</div>)
+		}
 	return (
 		<div className={DetalesStyle.outer}>
 			<div className={innerStyle}>
@@ -51,5 +55,5 @@ const Detales = () => {
 				</div>
 			</div>
 		</div>)
-}
+})
 export default Detales;
