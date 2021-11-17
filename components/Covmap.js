@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import {useEffect} from 'react';
 import L from 'leaflet';
 import Country from '../store/countryStore.js';
 import Cov from '../store/covStore.js';
 import sibCovArr from '../store/covInSib.js';
+import {WaitOrError} from './WaitOrErr.js';
+import {geoCountryToCov} from '../public/scripts/helpers.js';
+import {MAP_TOKEN} from '../keys';
 
 const mapContent = (el, layer, coords = []) => {
 	let radius = 250000;
@@ -18,9 +21,10 @@ const mapContent = (el, layer, coords = []) => {
 }
 
 const Covmap = () => {
+	if (!('geonameId' in Country.getGeoData()) || Cov.getData().length == 0) return <WaitOrError data={{msg: 'No one country select'}}/>
 	let coords = [];
 	useEffect(() => {
-		if (Country.getState() === 'done') {
+		if (Country.getIsLoading()) {
 			coords.push(Country.getGeoData().lat);
 			coords.push(Country.getGeoData().lng);
 		} else {
@@ -34,11 +38,12 @@ const Covmap = () => {
     		id: 'mapbox/streets-v11',
     		tileSize: 512,
     		zoomOffset: -1,
-    		accessToken: 'pk.eyJ1IjoidWhlbiIsImEiOiJja25zcDZoN2gyangzMnFueHlybm9heTV2In0.AhZrjp1alacLiSgt_jAh9A'
+    		accessToken: MAP_TOKEN
 		}).addTo(myMap);
 		const mainData = Country.getGeoData();
 		const covData = Cov.getData();
-		const currentCovData = covData.find(covItem => covItem.country.toLowerCase() === mainData.countryName.toLowerCase());
+		const alterName = geoCountryToCov(mainData.countryName);
+		const currentCovData = covData.find(covItem => covItem.country.toLowerCase() === mainData.countryName.toLowerCase() || covItem.country.toLowerCase() === alterName.toLowerCase());
 		mapContent(currentCovData, myMap, coords)
 		sibCovArr().forEach(item => {
 			mapContent(item, myMap);

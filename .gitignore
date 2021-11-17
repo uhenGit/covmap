@@ -1,5 +1,11 @@
 /node_modules
 /.next
 /config
+/components/Reglog.js
+/components/Login.js
+/components/Register.js
+/components/Subnav.js
+/pages/login.js
+/pages/register.js
 .env
-/public/scripts
+keys.js

@@ -25,6 +25,7 @@
 	position: absolute;
 	top: 5%;
 	right: 8%;
+	width: 15%;
 	cursor: pointer;
 	transition-duration: 300ms;
 }
@@ -59,7 +60,7 @@
 	text-align: right;
 	border: none;
 	cursor: pointer;
-	width: 125px;
+	width: 150px;
 	font-size: 14px;
 	padding: 5px;
 	border-radius: 3px;

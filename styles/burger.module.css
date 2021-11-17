@@ -1,0 +1,12 @@
+.lineWrap {
+    position: absolute;
+    top: 5%;
+    right: 90%;
+}
+.line {
+    display: block;
+    width: 30px;
+    height: 7px;
+    background-color: rgba(100, 100, 100, 0.7);
+    cursor: pointer;
+}

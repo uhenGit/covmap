@@ -1,28 +1,26 @@
-import Link from 'next/link';
-import navStyle from '../styles/nav.module.css';
+import { useState } from 'react';
+import { useMediaQ } from './hooks/useMediaQuery';
+import Navblock from './Navblock.js';
+import NavStyle from '../styles/nav.module.css';
 
 
-const Nav = () => {
+export default function Nav() {
+	let navcss;
+	const [showMobile, setMobile] = useState(false);
+	let isMobile = useMediaQ('(max-width: 768px)');
+	if (isMobile && !showMobile) {
+		navcss = NavStyle.navUl;
+	} else {
+		navcss = NavStyle.navUl + ' ' + NavStyle.show;
+	}
 	return (
-		<nav className={navStyle.navUl}>
-			<ul className='flex'>
-				<li>
-					<Link href="/">
-						<a>Home Page</a>
-					</Link>
-				</li>
-				<li>
-					<Link href="/about">
-						<a>About Page</a>
-					</Link>
-				</li>
-				<li>
-					<Link href="/contacts">
-						<a>Contact Page</a>
-					</Link>
-				</li>
-			</ul>
-		</nav>
+		<div className={NavStyle.mainWrap}>
+			{isMobile ? (<div className={NavStyle.lineWrap}>
+				<span className={NavStyle.line} onClick={() => setMobile(!showMobile)}></span>
+			</div>) : null}
+			<nav className={navcss}>
+				<Navblock isMobile={isMobile}/>
+			</nav>
+		</div>
 	)
 };
-export default Nav;

@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-// import { toJS } from 'mobx';
 import Table from './Table.js';
 import MapWrap from './Map.js';
 import Graph from './Graph.js';
 import Country from '../store/countryStore.js';
-import Cov from '../store/covStore.js';
 
 import contentStyle from '../styles/content.module.css';
 
 const Content = observer(() => {
 	useEffect(() => {
-		Country.getCurrentCoords();
+		// console.log(Country.getGeoData());
+		if (!('geonameId' in Country.getGeoData())) Country.getCurrentCoords();
 	}, []);
 	const [activeTab, setActiveTab] = useState('table');
-	// const [coValue, setCoValue] = useState([]);
 	const handleInput = e => {
 		setActiveTab(e.target.value);
 	};
@@ -24,7 +22,6 @@ const Content = observer(() => {
 	const mapStyle = `${contentStyle.tabLabel} ${activeMap}`;
 	const activeGraph = (activeTab === 'graph') ? `${contentStyle.active}` : '';
 	const graphStyle = `${contentStyle.tabLabel} ${activeGraph}`;
-	if (Country.state === 'processing...') return (<h3>Loading...</h3>)
 	return (
 		<main>
 			<div className='flex tabs'>

@@ -26,3 +26,9 @@
 .tabHeader td {
 	pointer-events: none;
 }
+@media screen and (max-width: 768px) {
+	.covTable {
+		width: 95%;
+		font-size: 0.8rem;
+	}
+}

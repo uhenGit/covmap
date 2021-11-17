@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Nav from './Nav.js';
-import Reglog from './Reglog.js';
+// import Reglog from './Reglog.js';
 
 import headerStyle from '../styles/header.module.css';
 const Header = () => {
@@ -15,7 +15,7 @@ const Header = () => {
 						</a>
 					</Link>
 				</div>
-				<Reglog />
+				{/* <Reglog /> */}
 			</div>
 			<Nav />
 		</header>

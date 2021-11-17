@@ -1,41 +1,39 @@
 import Country from '../store/countryStore.js';
 import User from '../store/userStore.js';
-import Detales from './Detales.js';
+import { covCountryToGeo } from '../public/scripts/helpers.js';
+import { useMediaQ } from './hooks/useMediaQuery';
 
-const Content = (props) => {
+const Content = ({data, sibs}) => {
+	if (useMediaQ('(max-width: 500px)')) console.log('window object:');
+	if (data.msg) return(
+		<tr>
+			<td colSpan='6'>{data.msg}</td>
+		</tr>
+	)
 	function showDetales(e) {
 		User.toggleShow();
 		User.setDetales(e);
 	};
 	function setToMain(i) {
-		let alterName;
-		switch (i) {
-			case 'USA':
-				alterName = 'United States'
-				break;
-		
-			default:
-				alterName = 'china'
-				break;
-		}
-		props.sibs.forEach(el => {
+		if (!sibs) return;
+		const alterName = covCountryToGeo(i);
+		sibs.forEach((el) => {
 			if (el.countryName.toLowerCase() === i.toLowerCase() || el.countryName.toLowerCase() === alterName.toLowerCase()) {
 				Country.setCountry(el)
 			}
 		});
 	}
-	if (props.data.fetching || props.data.error) {
-		return (<tr><td colSpan='4'>{props.data.msg}</td></tr>);
-	} else {
-		return (props.data.map(item => {
-			return (
-			<tr key={item.country}>
-				<td>{item.continentName}</td>
-				<td onClick={() => setToMain(item.country)} title='Click to push the Country on top'>{item.country}</td>
-				<td>{item.population}</td>
-				<td onClick={() => showDetales(item.country)} title='Click for Detales'>{item.cases.new}</td>	
-			</tr>)
+	return (data.map((item) => {
+		return (
+		<tr key={item.country}>
+			<td>{item.continent}</td>
+			<td>{item.day}</td>
+			<td onClick={() => setToMain(item.country)} title='Click to push the Country on top'>{item.country}</td>
+			<td>{item.population}</td>
+			<td onClick={() => showDetales(item.country)} title='Click for Detales'>{item.cases.new}</td>
+			<td>{item.deaths.total} ({item.deaths.new})</td>	
+		</tr>)
 		})
-	)};
+	);
 }
 export default Content;

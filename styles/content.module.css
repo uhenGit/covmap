@@ -25,18 +25,19 @@
 	display: inline-block;
 	position: absolute;
 	top: 20%;
+	left: 0;
 }
 .tabLabel:first-child::before {
 	background-image: url('../public/img/frequency.svg');
-	left: 31%;
+	/* left: 30%; */
 }
 .tabLabel:nth-child(2)::before {
 	background-image: url('../public/img/location.svg');
-	left: 34%;
+	/* left: 30%; */
 }
 .tabLabel:last-child::before {
 	background-image: url('../public/img/graph.svg');
-	left: 23%;
+	/* left: 20%; */
 }
 .tabInput {
 	display: none;
@@ -50,4 +51,11 @@
 	border-color: rgb(169, 169, 169);
 	color: rgb(100, 100, 100);
 	background-color: rgb(0, 0, 0);
+}
+
+@media screen and (max-width: 768px) {
+	.tabLabel span{
+		font-size: 1rem;
+		padding-top: 12px;
+	}
 }
