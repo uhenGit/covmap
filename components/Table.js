@@ -3,7 +3,7 @@ import Search from './Search.js';
 import TableData from './TableData.js';
 import Details from './Details.js';
 import { WaitOrError } from './WaitOrErr.js';
-import Cov from '../store/covStore.js';
+import covid from '../store/covStore.js';
 import User from '../store/userStore.js';
 
 const Table = observer(() => {
@@ -12,7 +12,7 @@ const Table = observer(() => {
 			<h2>Table</h2>
 			<Search />
 			{
-        Cov.getData().length !== 0
+        covid.covidData.length !== 0
           ? <TableData />
           : <WaitOrError/>
       }

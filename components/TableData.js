@@ -3,7 +3,7 @@ import TableRow from './TableRow.js';
 import { WaitOrError } from './WaitOrErr.js';
 import TableStyle from '../styles/covtable.module.css';
 import country from '../store/countryStore.js';
-import Cov from '../store/covStore.js';
+import covid from '../store/covStore.js';
 import sibCovArr from '../store/covInSib.js';
 import { geoCountryToCov } from '../public/scripts/helpers.js';
 
@@ -11,7 +11,7 @@ const TableData = observer(() => {
 	let countryTableRow;
   let siblingsTableRow;
 	const { countryName } = country.countryGeoData;
-	const covidData = Cov.getData();
+	const { covidData } = covid;
 
 	if (countryName) {
 		const { siblings } = country;

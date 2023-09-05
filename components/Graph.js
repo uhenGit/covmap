@@ -3,17 +3,17 @@ import { Bar } from '@visx/shape';
 import { Text } from '@visx/text';
 import { AxisBottom, AxisLeft } from '@visx/axis';
 import { scaleLinear, scaleBand } from '@visx/scale';
-import Country from "../store/countryStore";
-import Cov from "../store/covStore";
+import country from "../store/countryStore";
+import covid from "../store/covStore";
 
-const virData = [
-	{countryName: 'Uganda', cases: '30', deaths: '9'},
-	{countryName: 'Mongolia', cases: '8', deaths: '1'},
-	{countryName: 'New Zealand', cases: '70', deaths: '7'},
-	{countryName: 'India', cases: '200', deaths: '70'}
+const mockData = [
+	{ countryName: 'Uganda', cases: '30', deaths: '9' },
+	{ countryName: 'Mongolia', cases: '8', deaths: '1' },
+	{ countryName: 'New Zealand', cases: '70', deaths: '7' },
+	{ countryName: 'India', cases: '200', deaths: '70' }
 ];
 const mainVirData = { countryName: 'Chad', cases: '20', deaths: '5' };
-virData.unshift(mainVirData);
+mockData.unshift(mainVirData);
 const margins = { leftM: 20, topM: 20, bottomM: 20 };
 
 const getName = (d) => d.countryName;
@@ -30,31 +30,31 @@ const Graph = () => {
 	const xScale = scaleBand({
 		range: [0, xMax],
 		round: true,
-		domain: virData.map(getName),
+		domain: mockData.map(getName),
 		padding: 0.4
 	});
 	const yScale =scaleLinear({
 		range: [yMax, 0],
 		round: true,
-		domain: [0, Math.max(...virData.map(getCases))]
+		domain: [0, Math.max(...mockData.map(getCases))]
 	})
 
 	return width < 10 ? null : (
 		<section>
 			<h2>Graphical</h2>
 			<svg width={ width } height={ height }>
-					{ virData.map((el, i) => {
-              const country = getName(el);
+					{ mockData.map((el, i) => {
+              const countryName = getName(el);
               const barWidth = xScale.bandwidth();
               const barHeight = yMax - (yScale(getCases(el)) ?? 0);
-              const barX = xScale(country);
+              const barX = xScale(countryName);
               const barY = yMax - barHeight;
               let color = (i === 0)
                 ? 'rgba(233, 23, 217, 0.8)'
                 : 'rgba(23, 233, 217, 0.8)';
               return (
                 <Group 
-                  key={ country }
+                  key={ countryName }
                   onMouseEnter={
                     () => { console.log(`clicked: ${JSON.stringify(Object.values(el))}`); }
                   }
@@ -71,7 +71,7 @@ const Graph = () => {
 					  })
           }
 					<AxisBottom 
-						numTicks={ virData.length }
+						numTicks={ mockData.length }
 						top={ yMax }
 						scale={ xScale }
 						tickLabelProps={
@@ -99,4 +99,5 @@ const Graph = () => {
 			</svg>
 		</section>)
 };
+
 export default Graph;

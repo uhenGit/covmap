@@ -1,72 +1,109 @@
 import { toJS, observable, runInAction } from 'mobx';
-import {COV_API_KEY} from '../keys.js';
+import { COV_API_KEY } from '../keys.js';
 
-class Cov {
+class Covid {
 	constructor() {
 		this.covData = observable.array([]);
 		this.covDataByDay = observable.array([]);
-		this.state = observable.box('');
-		this.error = observable.box(null);
+		this.loadCovidDataStatus = observable.box('');
+		this.loadCovidDataError = observable.box({});
 	}
 	
-	inProcess(status) {
-		runInAction(() => {this.state.set(status)})
+  /**
+   * private
+   * @param {string} status 
+   */
+	#setStatus(status) {
+		runInAction(() => {
+      this.loadCovidDataStatus.set(status);
+    })
 	}
-	getData() { return toJS(this.covData) }
-	getState() { return toJS(this.state) }
-	getError() { return toJS(this.error) }
-	getDataByDay() { return toJS(this.covDataByDay) }
+
+  /**
+   * private
+   * @param {Object} error
+   */
+  #setError(error) {
+    this.#setStatus('error');
+    runInAction(() => {
+      this.loadCovidDataError.set(error);
+    })
+  }
+
+	get covidData() {
+    return toJS(this.covData);
+  }
+  
+	get status() {
+    return toJS(this.loadCovidDataStatus);
+  }
+
+	get error() {
+    return toJS(this.loadCovidDataError);
+  }
+
+	get covidDataByDay() {
+    return toJS(this.covDataByDay);
+  }
+
 	dropDataByDay() {
 		runInAction(() => {
-			this.covDataByDay.clear()
-			this.inProcess('done')
+			this.covDataByDay.clear();
 		})
 	}
-	async getCovData() {
-		this.inProcess('processing');
+
+	async getCovidData() {
+		this.#setStatus('in-progress');
+
 		try {
 			const res = await fetch(`https://covid-193.p.rapidapi.com/statistics`, {
 				"method": "GET",
 				"headers": {
 					"x-rapidapi-host": "covid-193.p.rapidapi.com",
-					"x-rapidapi-key": COV_API_KEY
+					"x-rapidapi-key": COV_API_KEY,
 				}
 			});
-			const data = await res.json();
-			runInAction(() => {this.covData.replace(data.response)})
-			this.inProcess('done');
+			const { response } = await res.json();
+			runInAction(() => {
+        this.covData.replace(response);
+      });
+			this.#setStatus('done');
 		}
 		catch (err) {
-			runInAction(() => {this.error.set(err)})
-			this.inProcess('error');
+			this.#setError(err);
 		}
 	};
-	async getCovDataByDay(c, d) {
-		this.inProcess('processing');
+
+	async getCovidDataByDay(country, date) {
+		this.#setStatus('in-progress');
+
 		try {
-			const res = await fetch(`https://covid-193.p.rapidapi.com/history?country=${c}&day=${d}`, {
-				"method": "GET",
-				"headers": {
-					"x-rapidapi-key": COV_API_KEY,
-					"x-rapidapi-host": "covid-193.p.rapidapi.com"
-				}
-			});
-			const data = await res.json();
-			if (data.response.length !== 0) {
-				runInAction(() => {this.covDataByDay.replace(data.response)});
-				this.inProcess('done');
+			const res = await fetch(
+        `https://covid-193.p.rapidapi.com/history?country=${country}&day=${date}`,
+        {
+          "method": "GET",
+          "headers": {
+            "x-rapidapi-key": COV_API_KEY,
+            "x-rapidapi-host": "covid-193.p.rapidapi.com"
+          }
+			  },
+      );
+			const { response } = await res.json();
+
+			if (response.length !== 0) {
+				runInAction(() => {
+          this.covDataByDay.replace(response);
+        });
+				this.#setStatus('done');
 			} else {
-				let err = 'No cov data. Maybe You want to see future';
-				runInAction(() => {this.error.set(err)});
-				this.inProcess('error');
+				this.#setError({ message: 'No cov data. Maybe You want to see future' });
 			}
 		}
 		catch (err) {
-			runInAction(() => {this.error.set(err)})
-			this.inProcess('error');
+			this.#setError(err);
 		}
 	}
 };
 
-export default new Cov();
+export default new Covid();
 

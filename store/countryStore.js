@@ -1,32 +1,32 @@
 import { toJS, observable, runInAction } from 'mobx';
-
 import { GEO_DATA_USERNAME } from '../keys.js';
 
 class Country {
 	constructor() {
 		this.currentCountryGeoData = observable.box({});
 		this.siblings = observable.array([]);
+    // @todo rename currentCountryName or refactor an array to something else
 		this.currentCountryName = observable.array([]);
 		this.loadCountryStatus = observable.box('');
 		this.loadCountryError = observable.box({});
 	}
 
 	/**
-   * 
+   * private
    * @param {string} status - current country handler status 
    */
-	setStatus(status) {
+	#setStatus(status) {
 		runInAction(() => {
 			this.loadCountryStatus.set(status);
 		});
 	}
 
   /**
-   * 
-   * @param {Object} erorr - error object
+   * private
+   * @param {Object} erorr
    */
-  setError(error) {
-    this.setStatus('error');
+  #setError(error) {
+    this.#setStatus('error');
     runInAction(() => {
 			this.loadCountryError.set(error);
     });
@@ -86,7 +86,7 @@ class Country {
    * @param {number} lon  - longitude
    */
 	async getCountry(lat, lon) {
-		this.setStatus('in-progress');
+		this.#setStatus('in-progress');
     const url = `http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=${GEO_DATA_USERNAME}&style=full`;
 
 		try {
@@ -94,15 +94,15 @@ class Country {
 			const { geonames } = await res.json();
 
 			if (geonames.length === 0) {
-        this.setError({ message: `I've no idea where are You now` });
+        this.#setError({ message: `I've no idea where are You now` });
 
 				return;
 			}
 
 			this.setCountry(geonames[0]);
-			this.setStatus('done');
+			this.#setStatus('done');
 		}	catch (err) {
-      this.setError(err);
+      this.#setError(err);
 		}
 	}
 
@@ -113,7 +113,7 @@ class Country {
    * @param {Object} selectedCountry 
    */
 	async setCountry(selectedCountry) {
-		this.setStatus('in-progress');
+		this.#setStatus('in-progress');
 		const country = toJS(selectedCountry);
 
 		try {
@@ -121,9 +121,9 @@ class Country {
         this.currentCountryGeoData.set(country);
       });
 			await this.getSiblings(country.countryId);
-			this.setStatus('done');
+			this.#setStatus('done');
 		}	catch (err) {
-      this.setError(err);
+      this.#setError(err);
 		}
 	}
 
@@ -132,14 +132,14 @@ class Country {
    * @param {string} countryId 
    */
 	async getSiblings(countryId) {
-		this.setStatus('in-progress');
+		this.#setStatus('in-progress');
 
 		try {
 			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${countryId}&username=${GEO_DATA_USERNAME}&style=full`);
 			const data = await res.json();
 
 			if (data.geonames.length === 0) {
-        this.setError({ message: 'No siblings' });
+        this.#setError({ message: 'No siblings' });
 
 				return;
 			}
@@ -147,9 +147,9 @@ class Country {
 			runInAction(() => {
         this.siblings.replace(data.geonames);
       });
-			this.setStatus('done');
+			this.#setStatus('done');
 		}	catch (err) {
-      this.setError(err);
+      this.#setError(err);
 		}
 	}
 
@@ -158,14 +158,14 @@ class Country {
    * @param {string} char - search query from the input
    */
 	async searchCountry(char) {
-		this.setStatus('in-progress');
+		this.#setStatus('in-progress');
 
 		try {
 			const res = await fetch(`http://api.geonames.org/searchJSON?name_startsWith=${char}&fcode=PCLI&username=${GEO_DATA_USERNAME}`);
 			const { geonames } = await res.json();
 
 			if (geonames.length == 0) {
-        this.setError({ message: 'No matches country' });
+        this.#setError({ message: 'No matches country' });
 
 				return;
 			}
@@ -173,9 +173,9 @@ class Country {
 			runInAction(() => {
         this.currentCountryName.replace(geonames);
       });
-			this.setStatus('done');
+			this.#setStatus('done');
 		}	catch (err) {
-      this.setError(err);
+      this.#setError(err);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 {
   "name": "chris-next",
   "version": "1.0.0",
-  "description": "Chris project with NextJS, Postgres and Express",
+  "description": "Covid cases tracker with the Data Table, Data Map and Data Chart (in progress)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,11 +10,11 @@
     "start": "next start"
   },
   "keywords": [
+    "React",
     "NextJS",
-    "PostgreSQL",
-    "ExpressJS",
     "Node",
-    "MobX"
+    "MobX",
+    "Leaflet"
   ],
   "author": "Eugene Nagorny",
   "license": "ISC",
