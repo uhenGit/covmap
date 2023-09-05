@@ -14,7 +14,7 @@ const Description = () => {
                     Please note, that some countries (like Central African Republic - CAR) have very poor info about the virus.
                 </p>
                 <h3>Some instructions</h3>
-                <h4>Navigate to <Link href='/data'>Data page:</Link></h4>
+                <h4>Navigate to <Link href={ '/data' }>Data page:</Link></h4>
                 <ul className={DescStyle.wrap}>
                     <li>
                         On <span className={DescStyle.imp}>Table Tab</span> You can:

@@ -5,10 +5,11 @@ import Content from '../components/Content.js';
 const Data = () => {
 	return (
 		<div className="mainWrap">
-			<Headblock title={'Data'} />
+			<Headblock title={ 'Data' } />
 			<Header />
 			<h2>Data Page</h2>
 			<Content />
 		</div>)
 };
+
 export default Data;

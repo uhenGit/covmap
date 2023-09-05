@@ -5,18 +5,18 @@ export default function Navblock({isMobile}) {
     return (
        <ul className={navStyle}>
            <li>
-               <Link href="/">
-                   <a>Home Page</a>
+               <Link href={ '/' }>
+                   Home Page
                </Link>
            </li>
            <li>
-               <Link href="/data">
-                    <a>Data Page</a>
+               <Link href={ '/data' }>
+                    Data Page
                </Link>
            </li>
            <li>
-               <Link href="/contacts">
-                   <a>Contact Page</a>
+               <Link href={ '/contacts' }>
+                   Contact Page
                </Link>
            </li>
        </ul>

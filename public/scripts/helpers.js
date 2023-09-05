@@ -1,7 +1,7 @@
-// import { useState, useEffect } from "react";
 module.exports = {
 	covCountryToGeo(c) {
 		let a;
+
 		switch (c) {
 			case 'USA':
 				a = 'United States'
@@ -13,11 +13,12 @@ module.exports = {
 				a = ''
 				break;
 		}
-		// console.log('helpers func: ',c);
+
 		return a;
 	},
 	geoCountryToCov(i) {
 		let b;
+
 		switch (i) {
 			case 'United States':
 				b = 'USA'
@@ -29,6 +30,7 @@ module.exports = {
 				b = ''
 				break;
 		}
+    
 		return b;
 	},
 	/*useMediaQ(query) {	

@@ -6,10 +6,11 @@ import Footer from '../components/Footer.js';
 const IndexPage = () => {
 	return (
 		<div>
-			<Headblock title={'Next Chris Project'} />
+			<Headblock title={ 'Covid tracker' } />
 			<Header />
 			<Description />
 			<Footer />
 		</div>
 )};
+
 export default IndexPage;

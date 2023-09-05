@@ -1,21 +1,24 @@
 import Cov from './covStore';
-import Country from './countryStore';
+import country from './countryStore';
 import { geoCountryToCov } from '../public/scripts/helpers';
 
 export default function sibCovArr() {
 	const covData = Cov.getData();
-	const sibs = Country.getAllSiblings();
-	let res = [];
-	for (let sib of sibs) {
-		let alterName = geoCountryToCov(sib.countryName);
+	const siblings = country.allSiblings;
+	const res = [];
+	for (let sibling of siblings) {
+		const alterName = geoCountryToCov(sibling.countryName);
 			covData.forEach((covEl) => {
-				if (covEl.country.toLowerCase() === sib.countryName.toLowerCase() || covEl.country.toLowerCase() === alterName.toLowerCase()) {
+        const isCountryNameMatched = covEl.country.toLowerCase() === sibling.countryName.toLowerCase();
+        const isCountryAlterNameMatched = covEl.country.toLowerCase() === alterName.toLowerCase();
+
+				if (isCountryNameMatched || isCountryAlterNameMatched) {
 					let elObj = {
-						bbox: sib.bbox,
-						lat: sib.lat,
-						lng: sib.lng,
+						bbox: sibling.bbox,
+						lat: sibling.lat,
+						lng: sibling.lng,
 						day: covEl.day,
-						continent: sib.continentCode,
+						continent: sibling.continentCode,
 						country: covEl.country,
 						population: covEl.population,
 						cases: covEl.cases,
@@ -25,5 +28,6 @@ export default function sibCovArr() {
 				}
 			})
 	}
+  
 	return res;
 }

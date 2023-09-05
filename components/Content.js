@@ -3,18 +3,21 @@ import { observer } from 'mobx-react-lite';
 import Table from './Table.js';
 import MapWrap from './Map.js';
 import Graph from './Graph.js';
-import Country from '../store/countryStore.js';
+import country from '../store/countryStore.js';
 
 import contentStyle from '../styles/content.module.css';
 
 const Content = observer(() => {
 	useEffect(() => {
-		// console.log(Country.getGeoData());
-		if (!('geonameId' in Country.getGeoData())) Country.getCurrentCoords();
+    const { countryGeoData } = country;
+
+		if (!('geonameId' in countryGeoData)) {
+      country.getCurrentCoords();
+    }
 	}, []);
 	const [activeTab, setActiveTab] = useState('table');
-	const handleInput = e => {
-		setActiveTab(e.target.value);
+	const handleInput = (evt) => {
+		setActiveTab(evt.target.value);
 	};
 	const activeTable = (activeTab === 'table') ? `${contentStyle.active}` : '';
 	const tableStyle = `${contentStyle.tabLabel} ${activeTable}`;
@@ -25,22 +28,37 @@ const Content = observer(() => {
 	return (
 		<main>
 			<div className='flex tabs'>
-				<label className={tableStyle}>
-					<input type='radio' name='tab' value='table' onChange={handleInput} className={contentStyle.tabInput}/>
+				<label className={ tableStyle }>
+					<input
+            type='radio'
+            name='tab'
+            value='table'
+            className={ contentStyle.tabInput }
+            onChange={ handleInput }/>
 					<span>Table</span>
 				</label>
-				<label className={mapStyle}>
-					<input type='radio' name='tab' value='map' onChange={handleInput} className={contentStyle.tabInput}/>
+				<label className={ mapStyle }>
+					<input
+            type='radio'
+            name='tab'
+            value='map'
+            className={ contentStyle.tabInput }
+            onChange={ handleInput }/>
 					<span>Map</span>
 				</label>
-				<label className={graphStyle}>
-					<input type='radio' name='tab' value='graph' onChange={handleInput} className={contentStyle.tabInput}/>
+				<label className={ graphStyle }>
+					<input
+            type='radio'
+            name='tab'
+            value='graph'
+            className={ contentStyle.tabInput }
+            onChange={ handleInput }/>
 					<span>Graphical</span>
 				</label>
 			</div>
-			{(activeTab === 'table') && <Table />}
-			{(activeTab === 'map') && <MapWrap />}
-			{(activeTab === 'graph') && <Graph />}
+			{ (activeTab === 'table') && <Table /> }
+			{ (activeTab === 'map') && <MapWrap /> }
+			{ (activeTab === 'graph') && <Graph /> }
 		</main>
 	);
 });

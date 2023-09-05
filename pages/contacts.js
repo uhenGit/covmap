@@ -3,7 +3,7 @@ import Headblock from '../components/Headblock.js';
 const Contacts = () => {
 	return (
 		<div className="mainWrap">
-			<Headblock title={'Contacts'} />
+			<Headblock title={ 'Contacts' } />
 			<Header />
 			<h2>Contacts</h2>
 		</div>

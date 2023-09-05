@@ -1,114 +1,184 @@
-import {toJS, observable, runInAction} from 'mobx';
+import { toJS, observable, runInAction } from 'mobx';
 
-import {GEO_DATA_USERNAME} from '../keys.js';
+import { GEO_DATA_USERNAME } from '../keys.js';
 
 class Country {
 	constructor() {
 		this.currentCountryGeoData = observable.box({});
 		this.siblings = observable.array([]);
-		this.countryName = observable.array([]);
-		this.state = observable.box('');
-		this.error = observable.box(null);
-		this.isError = observable.box(false);
-		this.isLoading = observable.box(false);
+		this.currentCountryName = observable.array([]);
+		this.loadCountryStatus = observable.box('');
+		this.loadCountryError = observable.box({});
 	}
-	// !!!!!!!!!!!!!!! implement in right places !!!!!!!!!!!!!!!
-	inProcess(s, l, e) {
+
+	/**
+   * 
+   * @param {string} status - current country handler status 
+   */
+	setStatus(status) {
 		runInAction(() => {
-			this.state.set(s);
-			this.isLoading.set(l);
-			this.isError.set(e);
-		})
+			this.loadCountryStatus.set(status);
+		});
 	}
-	getGeoData() {return toJS(this.currentCountryGeoData.get())};
-	getCountryName() {return this.countryName};
-	getState() {return toJS(this.state.get())};
-	getError() {return toJS(this.error.get())};
-	getAllSiblings() {return toJS(this.siblings)};
-	getIsLoading() {return this.isLoading.get()};
-	getIsError() {return this.isError.get()};
-	// clear siblings array
+
+  /**
+   * 
+   * @param {Object} erorr - error object
+   */
+  setError(error) {
+    this.setStatus('error');
+    runInAction(() => {
+			this.loadCountryError.set(error);
+    });
+  }
+
+  get countryGeoData() {
+    return toJS(this.currentCountryGeoData);
+  }
+
+	get countryName() {
+    return toJS(this.currentCountryName);
+  }
+
+	get status() {
+    return toJS(this.loadCountryStatus);
+  }
+
+	get error() {
+    return toJS(this.loadCountryError);
+  }
+
+	get isLoading() {
+    return toJS(this.loadCountryStatus) === 'in-progress';
+  }
+
+	get allSiblings() {
+    return toJS(this.siblings);
+  }
+
+	/**
+   * clear siblings array
+   */
 	dropCountryName() {
-		runInAction(() => {this.countryName.clear()});
+		runInAction(() => {
+      this.currentCountryName.clear();
+    });
 	}
-	// if navigator.geolocation
-	// if nav does not allow -> uses second parameter of getCurrentPosition()
+
+	/** 
+   * Get current coordinates from the browser api or use the default
+   * if navigation in the browser does not allow using second parameter of getCurrentPosition()
+   */
 	getCurrentCoords() {
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition((pos) => {
-				this.getCountryId(pos.coords.latitude, pos.coords.longitude);
-			}, () => this.getCountryId(48.45, 34.93))
+			navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          await this.getCountry(pos.coords.latitude, pos.coords.longitude);
+        },
+        async () => { await this.getCountry(48.45, 34.93) },
+      );
 		}
 	}
-	async getCountryId(lat, lon) {
-		this.inProcess('processing...', true, false);
+
+  /**
+   * Get country id using coordinates
+   * @param {number} lat - latitude
+   * @param {number} lon  - longitude
+   */
+	async getCountry(lat, lon) {
+		this.setStatus('in-progress');
+    const url = `http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=${GEO_DATA_USERNAME}&style=full`;
+
 		try {
-			const res = await fetch(`http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=${GEO_DATA_USERNAME}&style=full`);
-			const data = await res.json();
-			if (data.geonames.length === 0) {
-				runInAction(() => {this.error.set({ msg: `I've no idea where are You now` })});
-				this.inProcess('error', false, true);
-				return;
-			} 
-			this.setCountry(data.geonames[0]);
-			this.inProcess('done', false, false);
-		}
-		catch (err) {
-			runInAction(() => {this.error.set(err)});
-			this.inProcess('error', false, true);
-		}
-	};
-	setCountry(item) {
-		this.inProcess('', true, false);
-		const i = toJS(item);
-		console.log(i);
-		try {
-			this.getSiblings(i.countryId);
-			runInAction(() => {this.currentCountryGeoData.set(i)});
-			this.inProcess('done', false, false)
-		}
-		catch (err) {
-			runInAction(() => {this.error.set(err)});
-			this.inProcess('error', false, true);
-		}
-	}
-	async getSiblings(id) {
-		this.inProcess('processing...', true, false);
-		try {
-			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${id}&username=${GEO_DATA_USERNAME}&style=full`);
-			const data = await res.json();
-			if (data.geonames.length === 0) {
-				runInAction(() => {this.error.set({msg: 'No siblings'})});
-				this.inProcess('error', false, true);
+			const res = await fetch(url);
+			const { geonames } = await res.json();
+
+			if (geonames.length === 0) {
+        this.setError({ message: `I've no idea where are You now` });
+
 				return;
 			}
-			runInAction(() => {this.siblings.replace(data.geonames)});
-			this.inProcess('done', false, false);
+
+			this.setCountry(geonames[0]);
+			this.setStatus('done');
+		}	catch (err) {
+      this.setError(err);
 		}
-		catch (err) {
-			runInAction(() => {this.error.set(err)});
-			this.inProcess('error', false, true);
+	}
+
+  /**
+   * Set selected country to the store
+   * If the parameter comes from the clicked item in the countries table,
+   * it should be handled by toJS method
+   * @param {Object} selectedCountry 
+   */
+	async setCountry(selectedCountry) {
+		this.setStatus('in-progress');
+		const country = toJS(selectedCountry);
+
+		try {
+			runInAction(() => {
+        this.currentCountryGeoData.set(country);
+      });
+			await this.getSiblings(country.countryId);
+			this.setStatus('done');
+		}	catch (err) {
+      this.setError(err);
 		}
-	};
+	}
+
+  /**
+   * 
+   * @param {string} countryId 
+   */
+	async getSiblings(countryId) {
+		this.setStatus('in-progress');
+
+		try {
+			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${countryId}&username=${GEO_DATA_USERNAME}&style=full`);
+			const data = await res.json();
+
+			if (data.geonames.length === 0) {
+        this.setError({ message: 'No siblings' });
+
+				return;
+			}
+
+			runInAction(() => {
+        this.siblings.replace(data.geonames);
+      });
+			this.setStatus('done');
+		}	catch (err) {
+      this.setError(err);
+		}
+	}
+
+  /**
+   * 
+   * @param {string} char - search query from the input
+   */
 	async searchCountry(char) {
-		this.inProcess('processing...', true, false);
+		this.setStatus('in-progress');
+
 		try {
 			const res = await fetch(`http://api.geonames.org/searchJSON?name_startsWith=${char}&fcode=PCLI&username=${GEO_DATA_USERNAME}`);
-			const data = await res.json();
-			if (data.geonames.length == 0) {
-				runInAction(() => {this.error.set({msg: 'No matches country'})});
-				this.inProcess('error', false, true);
+			const { geonames } = await res.json();
+
+			if (geonames.length == 0) {
+        this.setError({ message: 'No matches country' });
+
 				return;
 			}
-			runInAction(() => {this.countryName.replace(data.geonames)});
-			this.inProcess('done', false, false);
+
+			runInAction(() => {
+        this.currentCountryName.replace(geonames);
+      });
+			this.setStatus('done');
+		}	catch (err) {
+      this.setError(err);
 		}
-		catch (err) {
-			runInAction(() => {this.error.set(err)});
-			this.inProcess('error', false, true);
-		}
-	};
-};
+	}
+}
 
 export default new Country();
 

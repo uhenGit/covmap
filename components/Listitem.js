@@ -1,15 +1,17 @@
 import { observer } from 'mobx-react-lite';
-import Country from '../store/countryStore.js';
+import country from '../store/countryStore.js';
 
 const ListItem = observer((props) => {
-	const getItem = () => {
-		Country.setCountry(props.item);
-		Country.dropCountryName();
+	const setItem = () => {
+		country.setCountry(props.item);
+		country.dropCountryName();
+    props.onSelectItem();
 	}
 	return (
-		<li onClick={getItem}>
-			{props.item.countryCode} - {props.item.countryName}
+		<li onClick={ setItem }>
+			{ props.item.countryCode } - { props.item.countryName }
 		</li>
 	)
 });
+
 export default ListItem;

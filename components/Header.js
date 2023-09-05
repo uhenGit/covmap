@@ -6,13 +6,11 @@ import headerStyle from '../styles/header.module.css';
 const Header = () => {
 	return (
 		<header>
-			<div className={headerStyle.topBlock}>
+			<div className={ headerStyle.topBlock }>
 				<div>
-					<Link href="/">
-						<a>
-							<img src="#" alt="logo" />
-							<span>LOGO</span>
-						</a>
+					<Link href={ '/' }>
+						<img src="#" alt="logo" />
+						<span>LOGO</span>
 					</Link>
 				</div>
 				{/* <Reglog /> */}
@@ -21,4 +19,5 @@ const Header = () => {
 		</header>
 	);
 };
+
 export default Header;

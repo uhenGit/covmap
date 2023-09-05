@@ -1,26 +1,35 @@
 import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { toJS } from 'mobx';
 import PureInput from './Pureinput.js';
-import SearchResult from './Searchresult.js';
-// import TableData from './Tabledata.js';
-import Country from '../store/countryStore.js';
+import SearchResult from './SearchResult.js';
+import country from '../store/countryStore.js';
 
 const Search = observer(()=>{
-	const initStr = '';
-	const [searchStr, setSearchStr] = useState(initStr);
-	const inputHandle = e => {
-		setSearchStr(e.target.value);
-		// Country.dropCurrentGeoData();
+	const [searchStr, setSearchStr] = useState('');
+	const handleInput = (evt) => {
+		setSearchStr(evt.target.value);
+
 		if (searchStr.length > 1) {
-			Country.searchCountry(searchStr)
+			country.searchCountry(searchStr);
 		}
 	};
+
 	return (
 		<>
-			<PureInput inputType='text' name='Find Your Country' placeholder='start typing here...' inputName='search' val={searchStr} inputFunc={inputHandle} />
-			{(Country.getCountryName().length > 0 && searchStr.length > 0) ? <SearchResult /> : null}
+			<PureInput
+        inputType='text'
+        name='Find Your Country'
+        placeholder='start typing here...'
+        inputName='search'
+        val={ searchStr }
+        inputFunc={ handleInput } />
+			{
+        country.countryName.length > 0 && searchStr.length > 0
+        ? <SearchResult onSelect={ () => { setSearchStr('') } } />
+        : null
+      }
 		</>
 	)
-})
+});
+
 export default Search;
