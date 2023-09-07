@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import Table from './Table.js';
 import MapWrap from './Map.js';
@@ -9,13 +9,13 @@ import contentStyle from '../styles/content.module.css';
 
 const Content = observer(() => {
 	useEffect(() => {
-    const { countryGeoData } = country;
+		const { countryGeoData } = country;
 
 		if (!('geonameId' in countryGeoData)) {
-      country.getCurrentCoords();
-    }
+			country.getCurrentCoords();
+		}
 	}, []);
-	const [activeTab, setActiveTab] = useState('table');
+	const [ activeTab, setActiveTab ] = useState('table');
 	const handleInput = (evt) => {
 		setActiveTab(evt.target.value);
 	};
@@ -30,29 +30,32 @@ const Content = observer(() => {
 			<div className='flex tabs'>
 				<label className={ tableStyle }>
 					<input
-            type='radio'
-            name='tab'
-            value='table'
-            className={ contentStyle.tabInput }
-            onChange={ handleInput }/>
+						type='radio'
+						name='tab'
+						value='table'
+						className={ contentStyle.tabInput }
+						onChange={ handleInput }
+					/>
 					<span>Table</span>
 				</label>
 				<label className={ mapStyle }>
 					<input
-            type='radio'
-            name='tab'
-            value='map'
-            className={ contentStyle.tabInput }
-            onChange={ handleInput }/>
+						type='radio'
+						name='tab'
+						value='map'
+						className={ contentStyle.tabInput }
+						onChange={ handleInput }
+					/>
 					<span>Map</span>
 				</label>
 				<label className={ graphStyle }>
 					<input
-            type='radio'
-            name='tab'
-            value='graph'
-            className={ contentStyle.tabInput }
-            onChange={ handleInput }/>
+						type='radio'
+						name='tab'
+						value='graph'
+						className={ contentStyle.tabInput }
+						onChange={ handleInput }
+					/>
 					<span>Graphical</span>
 				</label>
 			</div>
@@ -62,4 +65,5 @@ const Content = observer(() => {
 		</main>
 	);
 });
+
 export default Content;

@@ -1,3 +1,4 @@
+import React from "react";
 import { observer } from 'mobx-react-lite';
 import TableRow from './TableRow.js';
 import { WaitOrError } from './WaitOrErr.js';
@@ -9,7 +10,7 @@ import { geoCountryToCov } from '../public/scripts/helpers.js';
 
 const TableData = observer(() => {
 	let countryTableRow;
-  let siblingsTableRow;
+	let siblingsTableRow;
 	const { countryName } = country.countryGeoData;
 	const { covidData } = covid;
 
@@ -17,29 +18,29 @@ const TableData = observer(() => {
 		const { siblings } = country;
 		const alterName = geoCountryToCov(countryName);
 		const countryCovidData = covidData
-      .find((covidElement) => {
-        return (covidElement.country.toLowerCase() === countryName.toLowerCase())
-          || (covidElement.country.toLowerCase() === alterName.toLowerCase());
-      });
+			.find((covidElement) => {
+				return (covidElement.country.toLowerCase() === countryName?.toLowerCase())
+					|| (covidElement.country.toLowerCase() === alterName.toLowerCase());
+			});
 			
-    if (countryCovidData) {
-				const { continent, day, country, population, cases, deaths } = countryCovidData;
-				const countryCovidItems = [{ continent, day, country, population, cases, deaths }];
-				countryTableRow = <TableRow data={ countryCovidItems } />;
-			} else {
-        const message = `There's no virus data for the ${countryName} location`;
-				countryTableRow = <TableRow error={{ message }} />
-			}
+		if (countryCovidData) {
+			const { continent, day, country, population, cases, deaths } = countryCovidData;
+			const countryCovidItems = [ { continent, day, country, population, cases, deaths } ];
+			countryTableRow = <TableRow data={ countryCovidItems } />;
+		} else {
+			const message = `There's no virus data for the ${countryName} location`;
+			countryTableRow = <TableRow error={{ message }} />
+		}
 
-			if (siblings?.length !== 0) {
-				const siblingsCovidItems = sibCovArr();
-				siblingsTableRow = <TableRow data={ siblingsCovidItems } siblings={ siblings }/>
-			}
-	};
-  
+		if (siblings?.length !== 0) {
+			const siblingsCovidItems = sibCovArr();
+			siblingsTableRow = <TableRow data={ siblingsCovidItems } siblings={ siblings }/>
+		}
+	}
+	// @todo find out why is the condition always false
 	if (country.status === 'error') {
 		siblingsTableRow = <TableRow error={ country.error } />
-	};
+	}
 
 	return (
 		<table className={ TableStyle.covTable }>
@@ -57,21 +58,20 @@ const TableData = observer(() => {
 				<tr className={ TableStyle.tabHeader }>
 					<td colSpan='6'>Current country Data</td>
 				</tr>
-				{
-          country.isLoading
-            ? (<tr><td colSpan='6'><WaitOrError /></td></tr>)
-            : countryTableRow
-        }
+				{country.isLoading
+					? (<tr><td colSpan='6'><WaitOrError /></td></tr>)
+					: countryTableRow
+				}
 				<tr className={ TableStyle.tabHeader }>
 					<td colSpan='6'>Siblings Data</td>
 				</tr>
-				{
-          country.isLoading
-            ? (<tr><td colSpan='6'><WaitOrError /></td></tr>)
-            : siblingsTableRow
-        }
+				{country.isLoading
+					? (<tr><td colSpan='6'><WaitOrError /></td></tr>)
+					: siblingsTableRow
+				}
 			</tbody>
 		</table>
-)});
+	)
+});
 
 export default TableData;

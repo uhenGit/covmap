@@ -1,23 +1,25 @@
+import React from "react";
 import Link from 'next/link';
 
 const Subnav = () => {
 	return (
 		<ul>
 			<li>
-				<Link href="/main/">
-					<a>Posts</a>
+				<Link href={ "/main" }>
+					Posts
 				</Link>
 			</li>
 			<li>
-				<Link href="/main/cabinet">
-					<a>Cabinet</a>
+				<Link href={ "/main/cabinet" }>
+					Cabinet
 				</Link>
 			</li>
 			<li>
-				<Link href="/main/newpost">
-					<a>Add New Post</a>
+				<Link href={ "/main/newpost" }>
+					Add New Post
 				</Link>
 			</li>
 		</ul>)
-};
+}
+
 export default Subnav;

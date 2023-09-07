@@ -1,3 +1,4 @@
+import React from "react";
 import Header from '../components/Header.js';
 import Headblock from '../components/Headblock.js';
 const Contacts = () => {
@@ -8,5 +9,5 @@ const Contacts = () => {
 			<h2>Contacts</h2>
 		</div>
 	)
-};
+}
 export default Contacts;

@@ -1,3 +1,4 @@
+import React from "react";
 import Headblock from '../components/Headblock.js';
 import Header from '../components/Header.js';
 import Description from '../components/Description.js';
@@ -11,6 +12,7 @@ const IndexPage = () => {
 			<Description />
 			<Footer />
 		</div>
-)};
+	)
+}
 
 export default IndexPage;

@@ -1,3 +1,4 @@
+import React from "react";
 import { observer } from 'mobx-react-lite';
 import Search from './Search.js';
 import TableData from './TableData.js';
@@ -12,10 +13,10 @@ const Table = observer(() => {
 			<h2>Table</h2>
 			<Search />
 			{
-        covid.covidData.length !== 0
-          ? <TableData />
-          : <WaitOrError/>
-      }
+				covid.covidData.length !== 0
+					? <TableData />
+					: <WaitOrError/>
+			}
 			{ User.isShow() && <Details /> }
 		</div>)
 });

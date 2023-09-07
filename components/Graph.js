@@ -1,3 +1,4 @@
+import React from "react";
 import { Group } from '@visx/group';
 import { Bar } from '@visx/shape';
 import { Text } from '@visx/text';
@@ -28,76 +29,75 @@ const Graph = () => {
 	const xMax = width - margins.leftM;
 	const yMax = height - margins.topM - margins.bottomM;
 	const xScale = scaleBand({
-		range: [0, xMax],
+		range: [ 0, xMax ],
 		round: true,
 		domain: mockData.map(getName),
 		padding: 0.4
 	});
 	const yScale =scaleLinear({
-		range: [yMax, 0],
+		range: [ yMax, 0 ],
 		round: true,
-		domain: [0, Math.max(...mockData.map(getCases))]
+		domain: [ 0, Math.max(...mockData.map(getCases)) ]
 	})
 
 	return width < 10 ? null : (
 		<section>
 			<h2>Graphical</h2>
 			<svg width={ width } height={ height }>
-					{ mockData.map((el, i) => {
-              const countryName = getName(el);
-              const barWidth = xScale.bandwidth();
-              const barHeight = yMax - (yScale(getCases(el)) ?? 0);
-              const barX = xScale(countryName);
-              const barY = yMax - barHeight;
-              let color = (i === 0)
-                ? 'rgba(233, 23, 217, 0.8)'
-                : 'rgba(23, 233, 217, 0.8)';
-              return (
-                <Group 
-                  key={ countryName }
-                  onMouseEnter={
-                    () => { console.log(`clicked: ${JSON.stringify(Object.values(el))}`); }
-                  }
-                >
-                  <Bar									
-                    x={ barX }
-                    y={ barY }
-                    width={ barWidth }
-                    height={ barHeight }
-                    fill={ color }				
-                  />
-                </Group>
-              )
-					  })
-          }
-					<AxisBottom 
-						numTicks={ mockData.length }
-						top={ yMax }
-						scale={ xScale }
-						tickLabelProps={
-              () => ({
-                fill: 'rgb(20,20,20)',
-                fontSize: 16,
-                textAnchor: 'middle'
-              })
-            }
-					/>
-					<AxisLeft
-						scale={ yScale.nice() }
-						numTicks={ 10 }
-						top={ 0 }
-						tickLabelProps={
-              (e) => ({
-                fill: 'rgb(20,20,20)',
-                fontSize:13,
-                textAnchor: 'end',
-                x: 20,
-                y: (yScale(e) ?? 0) + 3
-              })
-            }
-					/>
+				{ mockData.map((el, i) => {
+					const countryName = getName(el);
+					const barWidth = xScale.bandwidth();
+					const barHeight = yMax - (yScale(getCases(el)) ?? 0);
+					const barX = xScale(countryName);
+					const barY = yMax - barHeight;
+					let color = (i === 0)
+						? 'rgba(233, 23, 217, 0.8)'
+						: 'rgba(23, 233, 217, 0.8)';
+					return (
+						<Group 
+							key={ countryName }
+							onMouseEnter={
+								() => { console.log(`clicked: ${JSON.stringify(Object.values(el))}`); }
+							}
+						>
+							<Bar									
+								x={ barX }
+								y={ barY }
+								width={ barWidth }
+								height={ barHeight }
+								fill={ color }				
+							/>
+						</Group>
+					)
+				})}
+				<AxisBottom 
+					numTicks={ mockData.length }
+					top={ yMax }
+					scale={ xScale }
+					tickLabelProps={
+						() => ({
+							fill: 'rgb(20,20,20)',
+							fontSize: 16,
+							textAnchor: 'middle'
+						})
+					}
+				/>
+				<AxisLeft
+					scale={ yScale.nice() }
+					numTicks={ 10 }
+					top={ 0 }
+					tickLabelProps={
+						(e) => ({
+							fill: 'rgb(20,20,20)',
+							fontSize:13,
+							textAnchor: 'end',
+							x: 20,
+							y: (yScale(e) ?? 0) + 3
+						})
+					}
+				/>
 			</svg>
 		</section>)
-};
+}
 
 export default Graph;

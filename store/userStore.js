@@ -1,31 +1,30 @@
 import { toJS, makeAutoObservable, runInAction } from 'mobx';
 
 class User {
-	showDetales = false;
-	detales = '';
-	constructor() {	
-		// this.userName = observable.box('');
+	showDetails = false;
+	details = '';
+	constructor() {
 		makeAutoObservable(this);
 	}
 	toggleShow() {
 		runInAction(() => {
-			this.showDetales = !this.showDetales;
+			this.showDetails = !this.showDetails;
 		})
 	}
 	isShow() {
-		return toJS(this.showDetales);
+		return toJS(this.showDetails);
 	}
 	setDetales(data) {
 		runInAction(() => {
-			this.detales = data;
+			this.details = data;
 		})
 	}
 	getDetales() {
-		return this.detales;
+		return this.details;
 	}
 	dropDetales() {
 		runInAction(() => {
-			this.detales = '';
+			this.details = '';
 		})
 	}
 }

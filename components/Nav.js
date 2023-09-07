@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useMediaQ } from './hooks/useMediaQuery';
 import Navblock from './Navblock.js';
 import NavStyle from '../styles/nav.module.css';
@@ -6,7 +6,7 @@ import NavStyle from '../styles/nav.module.css';
 
 export default function Nav() {
 	let navcss;
-	const [showMobile, setMobile] = useState(false);
+	const [ showMobile, setMobile ] = useState(false);
 	let isMobile = useMediaQ('(max-width: 768px)');
 	if (isMobile && !showMobile) {
 		navcss = NavStyle.navUl;
@@ -15,12 +15,14 @@ export default function Nav() {
 	}
 	return (
 		<div className={NavStyle.mainWrap}>
-			{isMobile ? (<div className={NavStyle.lineWrap}>
-				<span className={NavStyle.line} onClick={() => setMobile(!showMobile)}></span>
-			</div>) : null}
+			{ isMobile
+				? (<div className={NavStyle.lineWrap}>
+					<span className={NavStyle.line} onClick={ () => setMobile(!showMobile) }></span>
+				</div>)
+				: null}
 			<nav className={navcss}>
-				<Navblock isMobile={isMobile}/>
+				<Navblock isMobile={ isMobile }/>
 			</nav>
 		</div>
 	)
-};
+}

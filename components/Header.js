@@ -1,12 +1,13 @@
+import React from "react";
 import Link from 'next/link';
 import Nav from './Nav.js';
 // import Reglog from './Reglog.js';
+import HeaderStyle from '../styles/header.module.css';
 
-import headerStyle from '../styles/header.module.css';
 const Header = () => {
 	return (
 		<header>
-			<div className={ headerStyle.topBlock }>
+			<div className={ HeaderStyle.topBlock }>
 				<div>
 					<Link href={ '/' }>
 						<img src="#" alt="logo" />
@@ -18,6 +19,6 @@ const Header = () => {
 			<Nav />
 		</header>
 	);
-};
+}
 
 export default Header;
