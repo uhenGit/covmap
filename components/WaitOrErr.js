@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-export function WaitOrError({ data }) {
+function WaitOrError({ data }) {
 	return(
 		<>
 			<span>Wait please...</span>
@@ -14,3 +14,5 @@ export function WaitOrError({ data }) {
 WaitOrError.propTypes = {
 	data: PropTypes.object,
 }
+
+export default WaitOrError;

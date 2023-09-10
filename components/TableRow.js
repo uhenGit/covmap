@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import country from '../store/countryStore.js';
 import User from '../store/userStore.js';
-import { covCountryToGeo } from '../public/scripts/helpers.js';
+import { covidCountryNameToGeo } from '../utils/countryHandler';
 import { useMediaQ } from './hooks/useMediaQuery.js';
 
 const TableRow = ({ data, siblings, error }) => {
@@ -21,20 +21,17 @@ const TableRow = ({ data, siblings, error }) => {
 		User.setDetales(evt);
 	}
 
-	function setToMain(currentCountry) {
-		if (!siblings) {
+	async function setToMain(currentCountry) {
+		if (siblings.length === 0) {
 			return;
 		}
     
-		const alterName = covCountryToGeo(currentCountry);
-		siblings.forEach((sibling) => {
-			const isCountryNameMatched = sibling.countryName.toLowerCase() === currentCountry.toLowerCase();
-			const isAlterCountryNameMatched = sibling.countryName.toLowerCase() === alterName.toLowerCase();
-
-			if (isCountryNameMatched || isAlterCountryNameMatched) {
-				country.setCountry(sibling)
-			}
-		});
+		const alterName = covidCountryNameToGeo(currentCountry).toLowerCase();
+		const selectedSibling = siblings
+			.find(({ countryName }) => (
+				(countryName.toLowerCase() === currentCountry.toLowerCase()) || (countryName.toLowerCase() === alterName)
+			));
+		await country.setCountry(selectedSibling);
 	}
 
 	return (data.map((item) => (
@@ -52,9 +49,9 @@ const TableRow = ({ data, siblings, error }) => {
 				onClick={ () => showDetails(item.country) }
 				title='Click for Details'
 			>
-				{ item.cases.new }
+				{ item.cases.new || 'n/a' }
 			</td>
-			<td>{ item.deaths.total } ({ item.deaths.new })</td>
+			<td>{ item.deaths.total } ({ item.deaths.new || 0 })</td>
 		</tr>)
 	)
 	);

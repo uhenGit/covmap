@@ -33,7 +33,7 @@ class Country {
 	}
 
 	get countryGeoData() {
-		return toJS(this.currentCountryGeoData);
+		return this.currentCountryGeoData.get();
 	}
 
 	get countryName() {
@@ -41,15 +41,15 @@ class Country {
 	}
 
 	get status() {
-		return toJS(this.loadCountryStatus);
+		return this.loadCountryStatus.get();
 	}
 
 	get error() {
-		return toJS(this.loadCountryError);
+		return this.loadCountryError.get();
 	}
 
 	get isLoading() {
-		return toJS(this.loadCountryStatus) === 'in-progress';
+		return this.loadCountryStatus.get() === 'in-progress';
 	}
 
 	get allSiblings() {
@@ -136,17 +136,18 @@ class Country {
 
 		try {
 			const res = await fetch(`http://api.geonames.org/neighboursJSON?formatted=true&geonameId=${countryId}&username=${GEO_DATA_USERNAME}&style=full`);
-			const data = await res.json();
+			const { geonames } = await res.json();
 
-			if (data.geonames.length === 0) {
-				this.#setError({ message: 'No siblings' });
+			runInAction(() => {
+				this.siblings.replace(geonames);
+			});
+
+			if (geonames.length === 0) {
+				this.#setError({ message: 'No siblings were found' });
 
 				return;
 			}
 
-			runInAction(() => {
-				this.siblings.replace(data.geonames);
-			});
 			this.#setStatus('done');
 		} catch (err) {
 			this.#setError(err);

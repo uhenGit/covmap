@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import Search from './Search.js';
 import TableData from './TableData.js';
 import Details from './Details.js';
-import { WaitOrError } from './WaitOrErr.js';
+import WaitOrError from './WaitOrErr.js';
 import covid from '../store/covStore.js';
 import User from '../store/userStore.js';
 

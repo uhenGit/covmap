@@ -34,7 +34,7 @@ const Details = observer(() => {
 	// @todo investigate always false condition
 	if (covid.status === 'error') {
 		content = <ul>
-			<LiDate details={{details, inter: true, simpleLi: false}}/>
+			<LiDate details={{ details, inter: true, simpleLi: false }} />
 		</ul>
 		return (
 			<div className={ DetailsStyle.outer }>

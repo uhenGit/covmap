@@ -1,31 +1,25 @@
 import React from "react";
 import { observer } from 'mobx-react-lite';
 import TableRow from './TableRow.js';
-import { WaitOrError } from './WaitOrErr.js';
-import TableStyle from '../styles/covtable.module.css';
+import WaitOrError from './WaitOrErr.js';
 import country from '../store/countryStore.js';
-import covid from '../store/covStore.js';
-import sibCovArr from '../store/covInSib.js';
-import { geoCountryToCov } from '../public/scripts/helpers.js';
+import { getCovidDataByCountry, setCovidDataToSiblings } from '../utils/countryHandler.js';
+import TableStyle from '../styles/covtable.module.css';
 
 const TableData = observer(() => {
 	let countryTableRow;
 	let siblingsTableRow;
 	const { countryName } = country.countryGeoData;
-	const { covidData } = covid;
 
 	if (countryName) {
 		const { siblings } = country;
-		const alterName = geoCountryToCov(countryName);
-		const countryCovidData = covidData
-			.find((covidElement) => {
-				return (covidElement.country.toLowerCase() === countryName?.toLowerCase())
-					|| (covidElement.country.toLowerCase() === alterName.toLowerCase());
-			});
+		const countryCovidData = getCovidDataByCountry(countryName);
 			
 		if (countryCovidData) {
-			const { continent, day, country, population, cases, deaths } = countryCovidData;
-			const countryCovidItems = [ { continent, day, country, population, cases, deaths } ];
+			const { continent, day, population, cases, deaths } = countryCovidData;
+			const countryCovidItems = [
+				{ continent, day, country: countryName, population, cases, deaths },
+			];
 			countryTableRow = <TableRow data={ countryCovidItems } />;
 		} else {
 			const message = `There's no virus data for the ${countryName} location`;
@@ -33,7 +27,7 @@ const TableData = observer(() => {
 		}
 
 		if (siblings?.length !== 0) {
-			const siblingsCovidItems = sibCovArr();
+			const siblingsCovidItems = setCovidDataToSiblings();
 			siblingsTableRow = <TableRow data={ siblingsCovidItems } siblings={ siblings }/>
 		}
 	}

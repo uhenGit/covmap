@@ -35,11 +35,11 @@ class Covid {
 	}
   
 	get status() {
-		return toJS(this.loadCovidDataStatus);
+		return this.loadCovidDataStatus.get();
 	}
 
 	get error() {
-		return toJS(this.loadCovidDataError);
+		return this.loadCovidDataError.get();
 	}
 
 	get covidDataByDay() {

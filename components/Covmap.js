@@ -2,32 +2,45 @@ import React, { useEffect } from 'react';
 import L from 'leaflet';
 import country from '../store/countryStore.js';
 import covid from '../store/covStore.js';
-import sibCovArr from '../store/covInSib.js';
-import { WaitOrError } from './WaitOrErr.js';
-import { geoCountryToCov } from '../public/scripts/helpers.js';
-import { MAP_TOKEN } from '../keys';
+import WaitOrError from './WaitOrErr.js';
+import { geoCountryNameToCovid, setCovidDataToSiblings } from '../utils/countryHandler.js';
+import { MAP_TOKEN } from '../keys.js';
 
-const mapContent = (el, layer, coords = []) => {
-	// @todo move the code below to the separate handler
-	let radius = 250000;
+const mapContent = (country, layer, isRootElement = false) => {
+	const { radius, color, content } = prepareMapParams(country, isRootElement);
+	const { coords } = country;
 
-	if (coords.length === 0) {
-		coords.push(el.lat);
-		coords.push(el.lng);
-		radius = 10000 * Math.abs(Math.abs(el.bbox.east) - Math.abs(el.bbox.west));
-	}
-
-	const borderColor = parseInt(el.cases.new) * 20000 / parseInt(el.population);
-	const color = parseInt(el.cases.new) < 100
-		? 'rgb(250,180,10)'
-		: `rgba(230,10,10,${borderColor})`;
-	const content = `<b>${el.country}</b><br />Population: ${el.population}<br />Cases (new): ${el.cases.total} (${el.cases.new})<br />Total recovered: ${el.cases.recovered}`;
-	// end of the handler
 	L
 		.circle(coords, { radius, color })
 		.bindTooltip('Click for details')
 		.bindPopup(content)
 		.addTo(layer);
+}
+
+/**
+ * Calculate circle statement on the country area
+ * @param {Object} country
+ * @param {boolean} isRootElement - current country is on the top of the table
+ * @returns {Object} circle properties and content
+ * */
+const prepareMapParams = (country, isRootElement) => {
+	let radius = 250000;
+
+	if (!isRootElement) {
+		radius = 10000 * Math.abs(Math.abs(country.bbox.east) - Math.abs(country.bbox.west));
+	}
+
+	const currentNewCases = parseInt(country.cases.new, 10) || 0;
+	const borderColor = currentNewCases * 20000 / parseInt(country.population);
+	const bgColor = currentNewCases < 100 // @todo refactor 100 to percents of the new cases among the population
+		? 'rgb(250,180,10)'
+		: `rgba(230,10,10,${borderColor})`;
+	const content = `<b>${country.country}</b>
+		<br />Population: ${country.population}
+		<br />Cases (new): ${country.cases.total} (${country.cases.new || 0})
+		<br />Total recovered: ${country.cases.recovered}`;
+
+	return { radius, color: bgColor, content };
 }
 
 const Covmap = () => {
@@ -38,15 +51,8 @@ const Covmap = () => {
 		return <WaitOrError data={{ msg: 'No one country select' }}/>;
 	}
 
-	const coords = [];
 	useEffect(() => {
-		if (country.isLoading) {
-			coords.push(countryGeoData.lat);
-			coords.push(countryGeoData.lng);
-		} else {
-			coords.push(48.45);
-			coords.push(34.93);
-		}
+		const coords = [ countryGeoData.lat, countryGeoData.lng ];
 
 		const myMap = L.map('map').setView(coords, 4);
 		// @todo find out what is the accessToken in the URL below
@@ -62,14 +68,16 @@ const Covmap = () => {
 			},
 		).addTo(myMap);
 		const { countryName } = countryGeoData;
-		const alterName = geoCountryToCov(countryName);
-		const currentCovidData = covidData
-			.find((covidDataItem) => {
-				return (covidDataItem.country.toLowerCase() === countryName.toLowerCase())
-          || (covidDataItem.country.toLowerCase() === alterName.toLowerCase());
-			});
-		mapContent(currentCovidData, myMap, coords);
-		sibCovArr().forEach((item) => {
+		const alterName = geoCountryNameToCovid(countryName).toLowerCase();
+		const countryCovidData = covidData
+			.find(({ country }) => (
+				(country.toLowerCase() === countryName.toLowerCase()) || (country.toLowerCase() === alterName)
+			));
+		countryCovidData.coords = coords;
+
+		mapContent(countryCovidData, myMap, true);
+		const siblingsCovidItems = setCovidDataToSiblings();
+		siblingsCovidItems.forEach((item) => {
 			mapContent(item, myMap);
 		})}, []);
 

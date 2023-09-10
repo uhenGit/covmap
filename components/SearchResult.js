@@ -1,13 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ListItem from './Listitem.js';
-import { WaitOrError } from './WaitOrErr.js';
+import WaitOrError from './WaitOrErr.js';
 import country from '../store/countryStore.js';
 
 import SearchResStyle from '../styles/searchres.module.css';
 
 const SearchResult = ({ onSelect }) => {
-	if (!country.isLoading) {
+	if (country.isLoading) {
 		return <WaitOrError />;
 	}
 
