@@ -14,7 +14,7 @@ const SearchResult = ({ onSelect }) => {
 	return(
 		<ul className={ SearchResStyle.listWrap }>
 			<h3>Search results</h3>
-			{ country.countryName.map(
+			{ country.loadedCountries.map(
 				(item) => <ListItem key={ item.geonameId } item={ item } onSelectItem={ () => onSelect() }/>
 			)}
 		</ul>

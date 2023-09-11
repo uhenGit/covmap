@@ -25,7 +25,7 @@ const Search = observer(()=>{
 				inputFunc={ handleInput }
 			/>
 			{
-				(country.countryName.length > 0 && searchStr.length > 0)
+				(country.loadedCountries.length > 0 && searchStr.length > 0)
 					? <SearchResult onSelect={ () => { setSearchStr('') } } />
 					: null
 			}

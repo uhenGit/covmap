@@ -27,18 +27,20 @@ const prepareMapParams = (country, isRootElement) => {
 	let radius = 250000;
 
 	if (!isRootElement) {
+		// radius calculates from the country dimensions
 		radius = 10000 * Math.abs(Math.abs(country.bbox.east) - Math.abs(country.bbox.west));
 	}
 
 	const currentNewCases = parseInt(country.cases.new, 10) || 0;
-	const borderColor = currentNewCases * 20000 / parseInt(country.population);
+	// danger color calculates from the new cases on every 20 000 population
+	const dangerColor = currentNewCases * 20000 / parseInt(country.population);
 	const bgColor = currentNewCases < 100 // @todo refactor 100 to percents of the new cases among the population
 		? 'rgb(250,180,10)'
-		: `rgba(230,10,10,${borderColor})`;
+		: `rgba(230,10,10,${dangerColor})`;
 	const content = `<b>${country.country}</b>
 		<br />Population: ${country.population}
 		<br />Cases (new): ${country.cases.total} (${country.cases.new || 0})
-		<br />Total recovered: ${country.cases.recovered}`;
+		<br />Total recovered: ${country.cases.recovered || 0}`;
 
 	return { radius, color: bgColor, content };
 }

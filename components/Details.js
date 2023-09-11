@@ -31,7 +31,6 @@ const Details = observer(() => {
 
 	let content;
 
-	// @todo investigate always false condition
 	if (covid.status === 'error') {
 		content = <ul>
 			<LiDate details={{ details, inter: true, simpleLi: false }} />

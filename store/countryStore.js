@@ -5,8 +5,7 @@ class Country {
 	constructor() {
 		this.currentCountryGeoData = observable.box({});
 		this.siblings = observable.array([]);
-		// @todo rename currentCountryName or refactor an array to something else
-		this.currentCountryName = observable.array([]);
+		this.currentLoadedCountries = observable.array([]);
 		this.loadCountryStatus = observable.box('');
 		this.loadCountryError = observable.box({});
 	}
@@ -36,8 +35,8 @@ class Country {
 		return this.currentCountryGeoData.get();
 	}
 
-	get countryName() {
-		return toJS(this.currentCountryName);
+	get loadedCountries() {
+		return toJS(this.currentLoadedCountries);
 	}
 
 	get status() {
@@ -61,31 +60,36 @@ class Country {
    */
 	dropCountryName() {
 		runInAction(() => {
-			this.currentCountryName.clear();
+			this.currentLoadedCountries.clear();
 		});
 	}
 
 	/** 
    * Get current coordinates from the browser api or use the default
-   * if navigation in the browser does not allow using second parameter of getCurrentPosition()
+   * if the user deny access to the location in a browser, use the second parameter of getCurrentPosition()
    */
-	getCurrentCoords() {
+	async getCurrentCoords() {
 		if (navigator.geolocation) {
+			this.#setStatus('in-progress');
 			navigator.geolocation.getCurrentPosition(
 				async (pos) => {
-					await this.getCountry(pos.coords.latitude, pos.coords.longitude);
+					await this.#getCountry(pos.coords.latitude, pos.coords.longitude);
 				},
-				async () => { await this.getCountry(48.45, 34.93) },
+				// set default coords - Ukraine
+				async () => {	await this.#getCountry(48.45, 34.93); },
 			);
+		} else {
+			await this.#getCountry(48.45,34.93);
 		}
 	}
 
 	/**
-   * Get country id using coordinates
+	 * private
+   * Get country id using the coordinates
    * @param {number} lat - latitude
    * @param {number} lon  - longitude
    */
-	async getCountry(lat, lon) {
+	async #getCountry(lat, lon) {
 		this.#setStatus('in-progress');
 		const url = `http://api.geonames.org/findNearbyJSON?formatted=true&lat=${lat}&lng=${lon}&fclass=P&fcode=PPLA&fcode=PPL&fcode=PPLC&username=${GEO_DATA_USERNAME}&style=full`;
 
@@ -172,7 +176,7 @@ class Country {
 			}
 
 			runInAction(() => {
-				this.currentCountryName.replace(geonames);
+				this.currentLoadedCountries.replace(geonames);
 			});
 			this.#setStatus('done');
 		} catch (err) {

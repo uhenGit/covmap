@@ -31,7 +31,7 @@ const TableData = observer(() => {
 			siblingsTableRow = <TableRow data={ siblingsCovidItems } siblings={ siblings }/>
 		}
 	}
-	// @todo find out why is the condition always false
+
 	if (country.status === 'error') {
 		siblingsTableRow = <TableRow error={ country.error } />
 	}
