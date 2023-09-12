@@ -8,32 +8,31 @@ import TableStyle from '../styles/covtable.module.css';
 
 const TableData = observer(() => {
 	let countryTableRow;
-	let siblingsTableRow;
+	let siblingsTableRows;
 	const { countryName } = country.countryGeoData;
 
 	if (countryName) {
-		const { siblings } = country;
 		const countryCovidData = getCovidDataByCountry(countryName);
-			
-		if (countryCovidData) {
-			const { continent, day, population, cases, deaths } = countryCovidData;
-			const countryCovidItems = [
-				{ continent, day, country: countryName, population, cases, deaths },
-			];
-			countryTableRow = <TableRow data={ countryCovidItems } />;
-		} else {
-			const message = `There's no virus data for the ${countryName} location`;
-			countryTableRow = <TableRow error={{ message }} />
-		}
 
-		if (siblings?.length !== 0) {
-			const siblingsCovidItems = setCovidDataToSiblings();
-			siblingsTableRow = <TableRow data={ siblingsCovidItems } siblings={ siblings }/>
+		const countryCovidItems = [
+			{
+				...countryCovidData,
+				country: countryName,
+			},
+		];
+		countryTableRow = <TableRow data={ countryCovidItems } />;
+
+
+		const siblingsCovidItems = setCovidDataToSiblings();
+
+		if (siblingsCovidItems.length > 0) {
+			siblingsTableRows = <TableRow data={ siblingsCovidItems }/>
 		}
 	}
 
 	if (country.status === 'error') {
-		siblingsTableRow = <TableRow error={ country.error } />
+		// @todo return separate component for the errors, move this part on the top
+		siblingsTableRows = <TableRow data={[ { error: { message: country.error } } ]} />
 	}
 
 	return (
@@ -50,18 +49,20 @@ const TableData = observer(() => {
 			</thead>
 			<tbody>
 				<tr className={ TableStyle.tabHeader }>
-					<td colSpan='6'>Current country Data</td>
+					<td colSpan={6}>Current country Data</td>
 				</tr>
 				{country.isLoading
-					? (<tr><td colSpan='6'><WaitOrError /></td></tr>)
+					// @todo replace with the separate loader component
+					? (<tr><td colSpan={6}><WaitOrError /></td></tr>)
 					: countryTableRow
 				}
 				<tr className={ TableStyle.tabHeader }>
-					<td colSpan='6'>Siblings Data</td>
+					<td colSpan={6}>Siblings Data</td>
 				</tr>
 				{country.isLoading
-					? (<tr><td colSpan='6'><WaitOrError /></td></tr>)
-					: siblingsTableRow
+					// @todo replace with the separate component
+					? (<tr><td colSpan={6}><WaitOrError /></td></tr>)
+					: siblingsTableRows
 				}
 			</tbody>
 		</table>

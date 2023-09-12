@@ -32,20 +32,16 @@ export function geoCountryNameToCovid(countryName) {
 }
 
 export function setCovidDataToSiblings() {
-	const { allSiblings } = country;
-	return allSiblings?.map((sibling) => {
-		const { countryName } = sibling;
+	return country.siblings?.map((sibling) => {
+		const { countryName, lat, lng, bbox, continentCode } = sibling;
 		const siblingCovidData = getCovidDataByCountry(countryName);
 
 		return {
-			bbox: sibling.bbox,
-			coords: [ sibling.lat, sibling.lng ],
-			continent: sibling.continentCode,
+			bbox,
+			coords: [ lat, lng ],
+			continent: continentCode,
 			country: countryName,
-			day: siblingCovidData.day,
-			population: siblingCovidData.population,
-			cases: siblingCovidData.cases,
-			deaths: siblingCovidData.deaths,
+			...siblingCovidData,
 		};
 	});
 }
@@ -54,9 +50,11 @@ export function getCovidDataByCountry(countryName) {
 	const { covidData } = covid;
 	const alterName = geoCountryNameToCovid(countryName).toLowerCase();
 
-	return covidData.find(({ country }) => (
+	const countryCovidData = covidData.find(({ country }) => (
 		(country.toLowerCase() === countryName.toLowerCase()) || (country.toLowerCase() === alterName)
 	));
+
+	return countryCovidData || { error: { message: 'There is no covid data for this location', countryName } };
 }
 
 /*useMediaQ(query) {

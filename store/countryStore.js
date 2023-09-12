@@ -1,11 +1,11 @@
-import { toJS, observable, runInAction } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import { GEO_DATA_USERNAME } from '../keys.js';
 
 class Country {
 	constructor() {
 		this.currentCountryGeoData = observable.box({});
 		this.siblings = observable.array([]);
-		this.currentLoadedCountries = observable.array([]);
+		this.loadedCountries = observable.array([]);
 		this.loadCountryStatus = observable.box('');
 		this.loadCountryError = observable.box({});
 	}
@@ -35,10 +35,6 @@ class Country {
 		return this.currentCountryGeoData.get();
 	}
 
-	get loadedCountries() {
-		return toJS(this.currentLoadedCountries);
-	}
-
 	get status() {
 		return this.loadCountryStatus.get();
 	}
@@ -51,16 +47,12 @@ class Country {
 		return this.loadCountryStatus.get() === 'in-progress';
 	}
 
-	get allSiblings() {
-		return toJS(this.siblings);
-	}
-
 	/**
    * clear siblings array
    */
 	dropCountryName() {
 		runInAction(() => {
-			this.currentLoadedCountries.clear();
+			this.loadedCountries.clear();
 		});
 	}
 
@@ -118,13 +110,12 @@ class Country {
    */
 	async setCountry(selectedCountry) {
 		this.#setStatus('in-progress');
-		const country = toJS(selectedCountry);
 
 		try {
 			runInAction(() => {
-				this.currentCountryGeoData.set(country);
+				this.currentCountryGeoData.set(selectedCountry);
 			});
-			await this.getSiblings(country.countryId);
+			await this.getSiblings(selectedCountry.countryId);
 			this.#setStatus('done');
 		} catch (err) {
 			this.#setError(err);
@@ -176,7 +167,7 @@ class Country {
 			}
 
 			runInAction(() => {
-				this.currentLoadedCountries.replace(geonames);
+				this.loadedCountries.replace(geonames);
 			});
 			this.#setStatus('done');
 		} catch (err) {
