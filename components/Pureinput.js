@@ -2,23 +2,24 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const PureInput = (props) => {
-	return ((props.inputType !== "textarea")
+	const { name, inputName, inputType, inputFunc, val, placeholder } = props;
+	return ((inputType !== "textarea")
 		? (<label className="flex f-column">
-			<p>{ props.name }</p>
+			<p>{ name }</p>
 			<input
-				type={ props.inputType }
-				name={ props.inputName }
-				placeholder={ props.placeholder }
-				onChange={ props.inputFunc }
-				value={ props.val } />
+				type={ inputType }
+				name={ inputName }
+				placeholder={ placeholder }
+				onChange={ inputFunc }
+				value={ val } />
 		</label>)
 		: (<label className="flex f-column">
-			<p>{ props.name }</p>
+			<p>{ name }</p>
 			<textarea
-				name={ props.inputName }
-				placeholder={ props.placeholder }
-				onChange={ props.inputFunc }
-				value={ props.val }></textarea>
+				name={ inputName }
+				placeholder={ placeholder }
+				onChange={ inputFunc }
+				value={ val }></textarea>
 		</label>)
 	);
 }

@@ -7,6 +7,7 @@ import country from '../store/countryStore.js';
 import SearchResStyle from '../styles/searchres.module.css';
 
 const SearchResult = ({ onSelect }) => {
+	// @todo replace with the separate loader component
 	if (country.isLoading) {
 		return <WaitOrError />;
 	}
