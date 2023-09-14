@@ -1,7 +1,8 @@
 import React from "react";
 import { observer } from 'mobx-react-lite';
 import TableRow from './TableRow.js';
-import WaitOrError from './WaitOrErr.js';
+import Loader from './Loader.js';
+import Error from './Error.js';
 import country from '../store/countryStore.js';
 import { getCovidDataByCountry, setCovidDataToSiblings } from '../utils/countryHandler.js';
 import TableStyle from '../styles/covtable.module.css';
@@ -10,6 +11,10 @@ const TableData = observer(() => {
 	let countryTableRow;
 	let siblingsTableRows;
 	const { countryName } = country.countryGeoData;
+
+	if (country.status === 'error') {
+		return <Error error={ country.error } />
+	}
 
 	if (countryName) {
 		const countryCovidData = getCovidDataByCountry(countryName);
@@ -30,11 +35,6 @@ const TableData = observer(() => {
 		}
 	}
 
-	if (country.status === 'error') {
-		// @todo return separate component for the errors, move this part on the top
-		siblingsTableRows = <TableRow data={[ { error: { message: country.error } } ]} />
-	}
-
 	return (
 		<table className={ TableStyle.covTable }>
 			<thead>
@@ -52,16 +52,22 @@ const TableData = observer(() => {
 					<td colSpan={6}>Current country Data</td>
 				</tr>
 				{country.isLoading
-					// @todo replace with the separate loader component
-					? (<tr><td colSpan={6}><WaitOrError /></td></tr>)
+					? (<tr>
+						<td colSpan={6}>
+							<Loader spinDiameter={30}/>
+						</td>
+					</tr>)
 					: countryTableRow
 				}
 				<tr className={ TableStyle.tabHeader }>
 					<td colSpan={6}>Siblings Data</td>
 				</tr>
 				{country.isLoading
-					// @todo replace with the separate component
-					? (<tr><td colSpan={6}><WaitOrError /></td></tr>)
+					? (<tr>
+						<td colSpan={6}>
+							<Loader spinDiameter={30}/>
+						</td>
+					</tr>)
 					: siblingsTableRows
 				}
 			</tbody>

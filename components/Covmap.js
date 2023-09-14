@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import L from 'leaflet';
 import country from '../store/countryStore.js';
 import covid from '../store/covStore.js';
-import WaitOrError from './WaitOrErr.js';
+import Error from './Error.js';
 import { geoCountryNameToCovid, setCovidDataToSiblings } from '../utils/countryHandler.js';
 import { MAP_TOKEN } from '../keys.js';
 
@@ -50,7 +50,7 @@ const Covmap = () => {
 	const { covidData } = covid;
 
 	if (!('geonameId' in countryGeoData) || covidData.length === 0) {
-		return <WaitOrError data={{ msg: 'No one country select' }}/>;
+		return <Error error={{ message: 'No one country select' }}/>;
 	}
 
 	useEffect(() => {

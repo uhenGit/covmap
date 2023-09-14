@@ -27,7 +27,7 @@ const Content = observer(() => {
 	const graphStyle = `${contentStyle.tabLabel} ${activeGraph}`;
 	return (
 		<main>
-			<div className='flex tabs'>
+			<div className={'flex tabs'}>
 				<label className={ tableStyle }>
 					<input
 						type='radio'

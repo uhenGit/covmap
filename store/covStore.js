@@ -56,7 +56,7 @@ class Covid {
 		this.#setStatus('in-progress');
 
 		try {
-			const res = await fetch(`https://covid-193.p.rapidapi.com/statistics`, {
+			const res = await fetch('https://covid-193.p.rapidapi.com/statistics', {
 				"method": "GET",
 				"headers": {
 					"x-rapidapi-host": "covid-193.p.rapidapi.com",

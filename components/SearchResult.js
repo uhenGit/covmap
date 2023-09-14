@@ -1,15 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ListItem from './Listitem.js';
-import WaitOrError from './WaitOrErr.js';
+import Loader from './Loader.js';
 import country from '../store/countryStore.js';
 
 import SearchResStyle from '../styles/searchres.module.css';
 
 const SearchResult = ({ onSelect }) => {
-	// @todo replace with the separate loader component
 	if (country.isLoading) {
-		return <WaitOrError />;
+		return <Loader spinDiameter={30}/>;
 	}
 
 	return(
