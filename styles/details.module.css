@@ -1,3 +1,6 @@
+.detailLabel {
+	text-transform: capitalize;
+}
 .outer {
 	position: fixed;
 	width: 100%;

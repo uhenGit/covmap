@@ -6,26 +6,61 @@ import covid from '../store/covStore.js';
 import User from '../store/userStore.js';
 import DetailsStyle from '../styles/details.module.css';
 
-const Details = observer(() => {
-	const [ details, setDetails ] = useState({});
-	useEffect(() => autorun(() => {
-		if (User.getDetales() !== '' && !covid.covidDataByDay[0]) {
-			const currentCountryCovidData = covid.covidData.find(
-				(covidDataItem) => covidDataItem.country === User.getDetales(),
-			);
-			setDetails(currentCountryCovidData);
-		} else {
-			setDetails(covid.covidDataByDay[0]);
+function getFormDetails() {
+	const formFields = [ 'day', 'country', 'population', 'new' ];
+	const currentCountryCovidData = covid.covidData.find(
+		(covidDataItem) => covidDataItem.country === User.getDetales(),
+	);
+
+	return formFields.map((field) => {
+		if (field === 'new') {
+			return {
+				label: 'new cases',
+				value: currentCountryCovidData.cases.new || '0',
+				type: 'text',
+				handler: () => changeDate(field),
+			};
 		}
-	}),[]);
 
-	function toggle() {
-		User.dropDetales();
-		User.toggleShow();
-		covid.dropDataByDay();
+		return {
+			label: field,
+			value: currentCountryCovidData[field],
+			type: (field === 'day')
+				? field
+				: 'text',
+			handler: () => changeDate(field),
+		}
+	})
+}
+
+function changeDate(field) {
+	if (field !== 'day') {
+		return;
 	}
+	console.log('RUN');
+}
 
-	let innerStyle = details
+function hideModal() {
+	User.dropDetales();
+	User.toggleShow();
+	covid.dropDataByDay();
+}
+
+const Details = observer(() => {
+	const [ details, setDetails ] = useState([]);
+	useEffect(() => autorun(() => {
+		const formDetails = getFormDetails();
+		setDetails(formDetails);
+		/* if (User.getDetales() !== '' && !covid.covidDataByDay[0]) {
+			// console.log('true: ', formDetails);
+		} else {
+			console.log('false: ', covid.covidDataByDay)
+			setDetails(covid.covidDataByDay[0]);
+		} */
+	}), []);
+	console.log('state 1: ', details);
+
+	const innerStyle = details // empty object is truthy
 		? `${DetailsStyle.inner} ${DetailsStyle.active}`
 		: `${DetailsStyle.inner}`;
 
@@ -38,26 +73,31 @@ const Details = observer(() => {
 		return (
 			<div className={ DetailsStyle.outer }>
 				<div className={ innerStyle }>
-					<button onClick={ toggle }>Close</button>
+					<button onClick={ hideModal }>Close</button>
 					<h3 className='flex f-center f-column'>{ covid.loadCovidDataError.message }</h3>
 					{ content }
 				</div>
 			</div>)
 	}
 
-	if (details && details.cases) {
-		content = <ul>
-			<LiDate details={{ span: 'Country', info: details.country, simpleLi: true} }/>
-			<LiDate details={{ details, inter: false, simpleLi: false }} />
-			<LiDate details={{ span: 'Population', info: details.population, simpleLi: true }}/>
-			<LiDate details={{ span: 'New Cases', info: details.cases.new, simpleLi: true }}/>
-		</ul>
+	if (details.length > 0) {
+		content = details.map((detail) => (
+			<div key={ detail.label }>
+				<span className={ DetailsStyle.detailLabel }>{ detail.label }</span>
+				-
+				<input
+					type={ detail.type }
+					value={ detail.value }
+					onChange={ detail.handler }
+				/>
+			</div>
+		))
 	}
     
 	return (
 		<div className={ DetailsStyle.outer }>
 			<div className={ innerStyle }>
-				<button onClick={ toggle }>Close</button>
+				<button onClick={ hideModal }>Close</button>
 				<div>
 					<h2>Details</h2>
 					<h4>Click on date to select another day</h4>
