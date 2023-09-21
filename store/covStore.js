@@ -4,7 +4,6 @@ import { COV_API_KEY } from '../keys.js';
 class Covid {
 	constructor() {
 		this.covData = observable.array([]);
-		this.covDataByDay = observable.array([]);
 		this.loadCovidDataStatus = observable.box('');
 		this.loadCovidDataError = observable.box({});
 	}
@@ -42,16 +41,6 @@ class Covid {
 		return this.loadCovidDataError.get();
 	}
 
-	get covidDataByDay() {
-		return toJS(this.covDataByDay);
-	}
-
-	dropDataByDay() {
-		runInAction(() => {
-			this.covDataByDay.clear();
-		})
-	}
-
 	async getCovidData() {
 		this.#setStatus('in-progress');
 
@@ -75,8 +64,6 @@ class Covid {
 	}
 
 	async getCovidDataByDay(country, date) {
-		this.#setStatus('in-progress');
-
 		try {
 			const res = await fetch(
 				`https://covid-193.p.rapidapi.com/history?country=${country}&day=${date}`,
@@ -88,22 +75,18 @@ class Covid {
 					}
 				},
 			);
-			const { response } = await res.json();
+			const { response, errors } = await res.json();
 
-			if (response.length !== 0) {
-				runInAction(() => {
-					this.covDataByDay.replace(response);
-				});
-				this.#setStatus('done');
-			} else {
-				this.#setError({ message: 'No cov data. Maybe You want to see future' });
+			if (errors.length > 0 || response.length === 0) {
+				return { errorMsg: 'No data from the API' };
 			}
+
+			return response[0];
 		}
 		catch (err) {
-			this.#setError(err);
+			throw new Error('Covid data by day request error');
 		}
 	}
 }
 
 export default new Covid();
-

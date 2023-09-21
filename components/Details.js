@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import LiDate from './Lidate.js';
+import Error from "./Error";
 import covid from '../store/covStore.js';
 import User from '../store/userStore.js';
 import DetailsStyle from '../styles/details.module.css';
 
-function getFormDetails() {
+async function getFormDetails(country, date = null) {
+	const countryCovidDataByDay = date
+		? await covid.getCovidDataByDay(country, date)
+		: covid.covidData.find(
+			(covidDataItem) => covidDataItem.country === country,
+		);
+
+	if ('errorMsg' in countryCovidDataByDay) {
+		return [ countryCovidDataByDay ];
+	}
+
 	const formFields = [ 'day', 'country', 'population', 'new' ];
-	const currentCountryCovidData = covid.covidData.find(
-		(covidDataItem) => covidDataItem.country === User.getDetales(),
-	);
 
 	return formFields.map((field) => {
 		if (field === 'new') {
 			return {
 				label: 'new cases',
-				value: currentCountryCovidData.cases.new || '0',
+				value: countryCovidDataByDay.cases.new || '0',
 				type: 'text',
 				handler: () => changeDate(field),
 			};
@@ -24,7 +31,7 @@ function getFormDetails() {
 
 		return {
 			label: field,
-			value: currentCountryCovidData[field],
+			value: countryCovidDataByDay[field],
 			type: (field === 'day')
 				? field
 				: 'text',
@@ -43,45 +50,54 @@ function changeDate(field) {
 function hideModal() {
 	User.dropDetales();
 	User.toggleShow();
-	covid.dropDataByDay();
 }
 
 const Details = observer(() => {
 	const [ details, setDetails ] = useState([]);
 	useEffect(() => autorun(() => {
-		const formDetails = getFormDetails();
-		setDetails(formDetails);
-		/* if (User.getDetales() !== '' && !covid.covidDataByDay[0]) {
-			// console.log('true: ', formDetails);
-		} else {
-			console.log('false: ', covid.covidDataByDay)
-			setDetails(covid.covidDataByDay[0]);
-		} */
+		const country = 'USA';
+		getFormDetails(country)
+			.then((formDetails) => {
+				setDetails(formDetails)
+			})
+			.catch((err) => {
+				console.log('data by day error: ', err); });
 	}), []);
-	console.log('state 1: ', details);
 
-	const innerStyle = details // empty object is truthy
+	function setNewDate() {
+		getFormDetails('US', '2023-08-19')
+			.then((formDetails) => {
+				setDetails(formDetails);
+			})
+			.catch((err) => {
+				console.error('set new date error: ', err);
+			});
+	}
+
+	const innerStyle = details // empty array is truthy
 		? `${DetailsStyle.inner} ${DetailsStyle.active}`
 		: `${DetailsStyle.inner}`;
 
-	let content;
-
 	if (covid.status === 'error') {
-		content = <ul>
-			<LiDate details={{ details, inter: true, simpleLi: false }} />
-		</ul>
+
 		return (
 			<div className={ DetailsStyle.outer }>
 				<div className={ innerStyle }>
 					<button onClick={ hideModal }>Close</button>
-					<h3 className='flex f-center f-column'>{ covid.loadCovidDataError.message }</h3>
-					{ content }
+					<Error error={ covid.error }/>
 				</div>
-			</div>)
+			</div>
+		);
 	}
 
-	if (details.length > 0) {
-		content = details.map((detail) => (
+	const content = details.map((detail) => {
+		if ('errorMsg' in detail) {
+			return (
+				<div key={ detail.errorMsg }>{ detail.errorMsg }</div>
+			)
+		}
+
+		return (
 			<div key={ detail.label }>
 				<span className={ DetailsStyle.detailLabel }>{ detail.label }</span>
 				-
@@ -91,18 +107,19 @@ const Details = observer(() => {
 					onChange={ detail.handler }
 				/>
 			</div>
-		))
-	}
+		);
+	});
     
 	return (
 		<div className={ DetailsStyle.outer }>
 			<div className={ innerStyle }>
-				<button onClick={ hideModal }>Close</button>
+				<button className={ DetailsStyle.closeBtn } onClick={ hideModal }>close</button>
 				<div>
 					<h2>Details</h2>
 					<h4>Click on date to select another day</h4>
-					{ details && content }
+					{ content }
 				</div>
+				<button onClick={ setNewDate }>New Date</button>
 			</div>
 		</div>)
 });
