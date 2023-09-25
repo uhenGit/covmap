@@ -1,71 +1,79 @@
 import React, { useEffect, useState } from 'react';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import DatePicker from 'react-datepicker';
 import Error from "./Error";
 import covid from '../store/covStore.js';
 import User from '../store/userStore.js';
-import DetailsStyle from '../styles/details.module.css';
+import { formatDateToISOString } from '../utils/dateHandler';
 
-async function getFormDetails(country, date = null) {
+import TableStyle from '../styles/covtable.module.css';
+import DetailsStyle from '../styles/details.module.css';
+import 'react-datepicker/dist/react-datepicker.css';
+
+async function getFormDetails(date = null) {
+	const country = User.getDetails().toLowerCase();
 	const countryCovidDataByDay = date
 		? await covid.getCovidDataByDay(country, date)
 		: covid.covidData.find(
-			(covidDataItem) => covidDataItem.country === country,
+			(covidDataItem) => covidDataItem.country.toLowerCase() === country,
 		);
 
-	if ('errorMsg' in countryCovidDataByDay) {
-		return [ countryCovidDataByDay ];
+	if (countryCovidDataByDay && Object.keys(countryCovidDataByDay).length > 0 && ('errorMsg' in countryCovidDataByDay)) {
+		return [
+			{
+				label: 'Select another date',
+				value: date,
+				empty: true,
+			}
+		];
 	}
 
+	const formattedCountryCovidDataByDay = setFormattedDate(countryCovidDataByDay);
 	const formFields = [ 'day', 'country', 'population', 'new' ];
 
 	return formFields.map((field) => {
 		if (field === 'new') {
 			return {
 				label: 'new cases',
-				value: countryCovidDataByDay.cases.new || '0',
-				type: 'text',
-				handler: () => changeDate(field),
+				value: formattedCountryCovidDataByDay.cases.new || '0',
 			};
 		}
 
 		return {
 			label: field,
-			value: countryCovidDataByDay[field],
-			type: (field === 'day')
-				? field
-				: 'text',
-			handler: () => changeDate(field),
+			value: formattedCountryCovidDataByDay[field],
 		}
 	})
 }
 
-function changeDate(field) {
-	if (field !== 'day') {
-		return;
-	}
-	console.log('RUN');
+function setFormattedDate(covidData) {
+	return {
+		...covidData,
+		day:  new Date(covidData.day),
+	};
 }
 
 function hideModal() {
-	User.dropDetales();
+	User.dropDetails();
 	User.toggleShow();
 }
 
+// @todo fix component unmounting
 const Details = observer(() => {
 	const [ details, setDetails ] = useState([]);
 	useEffect(() => autorun(() => {
-		const country = 'USA';
-		getFormDetails(country)
+		getFormDetails()
 			.then((formDetails) => {
 				setDetails(formDetails)
 			})
 			.catch((err) => {
-				console.log('data by day error: ', err); });
+				console.error('data by day error: ', err); });
 	}), []);
 
-	function setNewDate() {
-		getFormDetails('US', '2023-08-19')
+	function setNewDate(date) {
+		const isoDate = formatDateToISOString(date);
+		getFormDetails(isoDate)
 			.then((formDetails) => {
 				setDetails(formDetails);
 			})
@@ -79,7 +87,6 @@ const Details = observer(() => {
 		: `${DetailsStyle.inner}`;
 
 	if (covid.status === 'error') {
-
 		return (
 			<div className={ DetailsStyle.outer }>
 				<div className={ innerStyle }>
@@ -90,36 +97,51 @@ const Details = observer(() => {
 		);
 	}
 
-	const content = details.map((detail) => {
-		if ('errorMsg' in detail) {
+	const content = details.map(({ value, label, empty }, idx) => {
+		if ((label === 'day') || empty) {
+			const selectedDate = new Date(value);
 			return (
-				<div key={ detail.errorMsg }>{ detail.errorMsg }</div>
+				<tr key={ idx }>
+					<td className={ DetailsStyle.detailLabel }>
+						{ label }
+					</td>
+					<td className={ DetailsStyle.pickerWrap }>
+						<DatePicker selected={ selectedDate } onChange={ (date) => setNewDate(date) } />
+					</td>
+				</tr>
 			)
 		}
 
 		return (
-			<div key={ detail.label }>
-				<span className={ DetailsStyle.detailLabel }>{ detail.label }</span>
-				-
-				<input
-					type={ detail.type }
-					value={ detail.value }
-					onChange={ detail.handler }
-				/>
-			</div>
+			<tr key={ idx }>
+				<td className={ DetailsStyle.detailLabel }>
+					{ label }
+				</td>
+				<td>
+					{ value }
+				</td>
+			</tr>
 		);
 	});
-    
+
 	return (
 		<div className={ DetailsStyle.outer }>
 			<div className={ innerStyle }>
-				<button className={ DetailsStyle.closeBtn } onClick={ hideModal }>close</button>
-				<div>
+				<button
+					className={ DetailsStyle.closeBtn }
+					onClick={ hideModal }
+				>
+					close
+				</button>
+				<div className={ 'flex f-column f-center' }>
 					<h2>Details</h2>
 					<h4>Click on date to select another day</h4>
-					{ content }
+					<table className={ TableStyle.covTable }>
+						<tbody>
+							{ content }
+						</tbody>
+					</table>
 				</div>
-				<button onClick={ setNewDate }>New Date</button>
 			</div>
 		</div>)
 });

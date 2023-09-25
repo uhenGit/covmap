@@ -2,7 +2,6 @@
 	width: 80%;
 }
 .covTable tr {
-	cursor: pointer;
 	transition-duration: 300ms;
 }
 .covTable tr:nth-child(even) {

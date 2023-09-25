@@ -47,7 +47,7 @@ const TableData = observer(() => {
 					<th>Deaths Total (New)</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody className={ 'c-pointer' }>
 				<tr className={ TableStyle.tabHeader }>
 					<td colSpan={6}>Current country Data</td>
 				</tr>
