@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from "prop-types";
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import DatePicker from 'react-datepicker';
@@ -11,13 +12,10 @@ import TableStyle from '../styles/covtable.module.css';
 import DetailsStyle from '../styles/details.module.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
-async function getFormDetails(date = null) {
-	const country = User.getDetails().toLowerCase();
-	const countryCovidDataByDay = date
-		? await covid.getCovidDataByDay(country, date)
-		: covid.covidData.find(
-			(covidDataItem) => covidDataItem.country.toLowerCase() === country,
-		);
+async function getFormDetails(country, date) {
+	// const country = User.getDetails().toLowerCase();
+	const countryCovidDataByDay = await covid.getCovidDataByDay(country, date)
+	// console.log('data by day: ', country);
 
 	if (countryCovidDataByDay && Object.keys(countryCovidDataByDay).length > 0 && ('errorMsg' in countryCovidDataByDay)) {
 		return [
@@ -29,7 +27,11 @@ async function getFormDetails(date = null) {
 		];
 	}
 
-	const formattedCountryCovidDataByDay = setFormattedDate(countryCovidDataByDay);
+	return formatCovidData(countryCovidDataByDay);
+}
+
+function formatCovidData(covidData) {
+	const formattedCountryCovidDataByDay = setFormattedDate(covidData);
 	const formFields = [ 'day', 'country', 'population', 'new' ];
 
 	return formFields.map((field) => {
@@ -48,32 +50,38 @@ async function getFormDetails(date = null) {
 }
 
 function setFormattedDate(covidData) {
+	console.log('formatted: ', covidData);
 	return {
 		...covidData,
 		day:  new Date(covidData.day),
 	};
 }
 
-function hideModal() {
+/* function hideModal() {
 	User.dropDetails();
 	User.toggleShow();
-}
+} */
 
-// @todo fix component unmounting
-const Details = observer(() => {
+const Details = observer(({ showDetails, countryData, closeDetails }) => {
 	const [ details, setDetails ] = useState([]);
-	useEffect(() => autorun(() => {
-		getFormDetails()
+
+	/* const rawFormDetails = covid.covidData.find(
+		(covidDataItem) => covidDataItem.country.toLowerCase() === country,
+	); */
+	const formattedCovidData = formatCovidData(countryData);
+	setDetails(formattedCovidData);
+	/* useEffect(() => autorun(() => {
+		getFormDetails(country)
 			.then((formDetails) => {
 				setDetails(formDetails)
 			})
 			.catch((err) => {
 				console.error('data by day error: ', err); });
-	}), []);
+	}), []); */
 
 	function setNewDate(date) {
 		const isoDate = formatDateToISOString(date);
-		getFormDetails(isoDate)
+		getFormDetails(countryData.country, isoDate)
 			.then((formDetails) => {
 				setDetails(formDetails);
 			})
@@ -81,16 +89,13 @@ const Details = observer(() => {
 				console.error('set new date error: ', err);
 			});
 	}
-
-	const innerStyle = details // empty array is truthy
-		? `${DetailsStyle.inner} ${DetailsStyle.active}`
-		: `${DetailsStyle.inner}`;
+	// const outerStyle = `${DetailsStyle.outer} ${DetailsStyle.active}`;
 
 	if (covid.status === 'error') {
 		return (
-			<div className={ DetailsStyle.outer }>
-				<div className={ innerStyle }>
-					<button onClick={ hideModal }>Close</button>
+			<div className={ outerStyle }>
+				<div className={ DetailsStyle.inner }>
+					<button onClick={ () => closeDetails(null) }>Close</button>
 					<Error error={ covid.error }/>
 				</div>
 			</div>
@@ -124,26 +129,27 @@ const Details = observer(() => {
 		);
 	});
 
+	const modalStyles = {
+		top: showDetails ? '0' : '-100%'
+	};
+
 	return (
-		<div className={ DetailsStyle.outer }>
-			<div className={ innerStyle }>
-				<button
-					className={ DetailsStyle.closeBtn }
-					onClick={ hideModal }
-				>
-					close
-				</button>
-				<div className={ 'flex f-column f-center' }>
-					<h2>Details</h2>
-					<h4>Click on date to select another day</h4>
-					<table className={ TableStyle.covTable }>
-						<tbody>
-							{ content }
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>)
+		<div className={ 'flex f-column f-center' }>
+			<h2>Details</h2>
+			<h4>Click on date to select another day</h4>
+			<table className={ TableStyle.covTable }>
+				<tbody>
+					{ content }
+				</tbody>
+			</table>
+		</div>
+	)
 });
+
+Details.propTypes = {
+	showDetails: PropTypes.bool,
+	country: PropTypes.string,
+	closeDetails: PropTypes.func,
+}
 
 export default Details;

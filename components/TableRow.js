@@ -24,7 +24,7 @@ const TableRow = ({ data }) => {
 			return;
 		}
 
-		await country.setCountry(selectedSibling);
+		// await country.setCountry(selectedSibling);
 	}
 
 	return (data.map((item) => {

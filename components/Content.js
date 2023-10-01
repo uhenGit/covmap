@@ -3,19 +3,27 @@ import { observer } from 'mobx-react-lite';
 import Table from './Table.js';
 import MapWrap from './Map.js';
 import Graph from './Graph.js';
+import Loader from "./Loader";
 import country from '../store/countryStore.js';
 
 import contentStyle from '../styles/content.module.css';
+import covid from "../store/covStore";
 
 const Content = observer(() => {
-	useEffect(() => {
-		const { countryGeoData } = country;
-
-		if (!('geonameId' in countryGeoData)) {
-			country.getCurrentCoords();
-		}
-	}, []);
 	const [ activeTab, setActiveTab ] = useState('table');
+
+	if ((covid.covidData.length === 0) || !('geonameId' in { ...country.countryGeoData })) {
+		return <Loader spinDiameter={50}/>;
+	}
+	/* useEffect(() => {
+		// const { countryGeoData } = country;
+		// console.log('CONTENT: ', countryGeoData);
+
+		// if (!countryGeoData || !('geonameId' in countryGeoData)) {
+		country.getCurrentCoords();
+		setActiveTab('table');
+		// }
+	}, []); */
 	const handleInput = (evt) => {
 		setActiveTab(evt.target.value);
 	};

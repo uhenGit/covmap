@@ -32,6 +32,7 @@ class Country {
 	}
 
 	get countryGeoData() {
+		// console.log('store: ', this.currentCountryGeoData.get())
 		return this.currentCountryGeoData.get();
 	}
 
@@ -60,18 +61,28 @@ class Country {
    * Get current coordinates from the browser api or use the default
    * if the user deny access to the location in a browser, use the second parameter of getCurrentPosition()
    */
-	async getCurrentCoords() {
+	getCurrentCoords() {
+		// let selectedCountry;
+
 		if (navigator.geolocation) {
 			this.#setStatus('in-progress');
 			navigator.geolocation.getCurrentPosition(
-				async (pos) => {
-					await this.#getCountry(pos.coords.latitude, pos.coords.longitude);
+				(pos) => {
+					this.#getCountry(pos.coords.latitude, pos.coords.longitude)
+						.then((selectedCountry) => this.setCountry(selectedCountry))
+						.catch((err) => console.error('Set country error 0: ', err));
 				},
 				// set default coords - Ukraine
-				async () => {	await this.#getCountry(48.45, 34.93); },
+				async () => {
+					this.#getCountry(48.45, 34.93)
+						.then((selectedCountry) => this.setCountry(selectedCountry))
+						.catch((err) => console.error('Set country error 1: ', err));
+				},
 			);
 		} else {
-			await this.#getCountry(48.45,34.93);
+			this.#getCountry(48.45,34.93)
+				.then((selectedCountry) => this.setCountry(selectedCountry))
+				.catch((err) => console.error('Set country error 2: ', err));
 		}
 	}
 
@@ -95,8 +106,8 @@ class Country {
 				return;
 			}
 
-			await this.setCountry(geonames[0]);
 			this.#setStatus('done');
+			return geonames[0];
 		} catch (err) {
 			this.#setError(err);
 		}

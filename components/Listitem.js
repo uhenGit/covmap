@@ -6,7 +6,7 @@ import country from '../store/countryStore.js';
 const ListItem = observer(({ item, onSelectItem }) => {
 	const { countryCode, countryName } = item;
 	const setItem = async () => {
-		await country.setCountry(item);
+		// await country.setCountry(item);
 		country.dropCountryName();
 		onSelectItem();
 	}
