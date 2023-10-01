@@ -93,11 +93,9 @@ const Details = observer(({ showDetails, countryData, closeDetails }) => {
 
 	if (covid.status === 'error') {
 		return (
-			<div className={ outerStyle }>
-				<div className={ DetailsStyle.inner }>
-					<button onClick={ () => closeDetails(null) }>Close</button>
-					<Error error={ covid.error }/>
-				</div>
+			<div>
+				<button onClick={ () => closeDetails(null) }>close</button>
+				<Error error={ covid.error }/>
 			</div>
 		);
 	}
@@ -128,10 +126,6 @@ const Details = observer(({ showDetails, countryData, closeDetails }) => {
 			</tr>
 		);
 	});
-
-	const modalStyles = {
-		top: showDetails ? '0' : '-100%'
-	};
 
 	return (
 		<div className={ 'flex f-column f-center' }>
