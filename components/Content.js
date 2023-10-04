@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import Table from './Table.js';
 import MapWrap from './Map.js';
@@ -15,15 +15,7 @@ const Content = observer(() => {
 	if ((covid.covidData.length === 0) || !('geonameId' in { ...country.countryGeoData })) {
 		return <Loader spinDiameter={50}/>;
 	}
-	/* useEffect(() => {
-		// const { countryGeoData } = country;
-		// console.log('CONTENT: ', countryGeoData);
 
-		// if (!countryGeoData || !('geonameId' in countryGeoData)) {
-		country.getCurrentCoords();
-		setActiveTab('table');
-		// }
-	}, []); */
 	const handleInput = (evt) => {
 		setActiveTab(evt.target.value);
 	};

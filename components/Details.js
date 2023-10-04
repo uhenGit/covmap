@@ -5,124 +5,77 @@ import { observer } from 'mobx-react-lite';
 import DatePicker from 'react-datepicker';
 import Error from "./Error";
 import covid from '../store/covStore.js';
-import User from '../store/userStore.js';
 import { formatDateToISOString } from '../utils/dateHandler';
 
 import TableStyle from '../styles/covtable.module.css';
 import DetailsStyle from '../styles/details.module.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
-async function getFormDetails(country, date) {
-	// const country = User.getDetails().toLowerCase();
-	const countryCovidDataByDay = await covid.getCovidDataByDay(country, date)
-	// console.log('data by day: ', country);
+async function getFormDetails(selectedCountry, date = null) {
+	const countryCovidDataByDay = date
+		? await covid.getCovidDataByDay(selectedCountry, date)
+		: covid.covidData.find(({ country }) => country.toLowerCase() === selectedCountry);
 
 	if (countryCovidDataByDay && Object.keys(countryCovidDataByDay).length > 0 && ('errorMsg' in countryCovidDataByDay)) {
-		return [
-			{
-				label: 'Select another date',
-				value: date,
-				empty: true,
-			}
-		];
+		// @todo handle this case in the details table
+		return {
+			label: 'Select another date',
+			value: date,
+			empty: true,
+		};
 	}
 
-	return formatCovidData(countryCovidDataByDay);
+	return countryCovidDataByDay;
 }
 
-function formatCovidData(covidData) {
-	const formattedCountryCovidDataByDay = setFormattedDate(covidData);
-	const formFields = [ 'day', 'country', 'population', 'new' ];
-
-	return formFields.map((field) => {
-		if (field === 'new') {
-			return {
-				label: 'new cases',
-				value: formattedCountryCovidDataByDay.cases.new || '0',
-			};
-		}
-
-		return {
-			label: field,
-			value: formattedCountryCovidDataByDay[field],
-		}
-	})
-}
-
-function setFormattedDate(covidData) {
-	console.log('formatted: ', covidData);
-	return {
-		...covidData,
-		day:  new Date(covidData.day),
-	};
-}
-
-/* function hideModal() {
-	User.dropDetails();
-	User.toggleShow();
-} */
-
-const Details = observer(({ showDetails, countryData, closeDetails }) => {
-	const [ details, setDetails ] = useState([]);
-
-	/* const rawFormDetails = covid.covidData.find(
-		(covidDataItem) => covidDataItem.country.toLowerCase() === country,
-	); */
-	const formattedCovidData = formatCovidData(countryData);
-	setDetails(formattedCovidData);
-	/* useEffect(() => autorun(() => {
-		getFormDetails(country)
-			.then((formDetails) => {
-				setDetails(formDetails)
-			})
-			.catch((err) => {
-				console.error('data by day error: ', err); });
-	}), []); */
-
-	function setNewDate(date) {
-		const isoDate = formatDateToISOString(date);
-		getFormDetails(countryData.country, isoDate)
+//@ todo double check 'observer' || autorun usability
+const Details = observer(({ selectedCountry }) => {
+	const [ details, setDetails ] = useState({});
+	useEffect(() => {
+		getFormDetails(selectedCountry)
 			.then((formDetails) => {
 				setDetails(formDetails);
 			})
 			.catch((err) => {
-				console.error('set new date error: ', err);
+				console.error('Set details error: ', err);
+			});
+	}, []);
+
+	function setNewDate(date) {
+		const isoDate = formatDateToISOString(date);
+		getFormDetails(selectedCountry, isoDate)
+			.then((formDetails) => {
+				setDetails(formDetails);
+			})
+			.catch((err) => {
+				console.error('Set new details date error: ', err);
 			});
 	}
-	// const outerStyle = `${DetailsStyle.outer} ${DetailsStyle.active}`;
 
 	if (covid.status === 'error') {
 		return (
 			<div>
-				<button onClick={ () => closeDetails(null) }>close</button>
 				<Error error={ covid.error }/>
 			</div>
 		);
 	}
 
-	const content = details.map(({ value, label, empty }, idx) => {
-		if ((label === 'day') || empty) {
-			const selectedDate = new Date(value);
-			return (
-				<tr key={ idx }>
-					<td className={ DetailsStyle.detailLabel }>
-						{ label }
-					</td>
-					<td className={ DetailsStyle.pickerWrap }>
-						<DatePicker selected={ selectedDate } onChange={ (date) => setNewDate(date) } />
-					</td>
-				</tr>
-			)
-		}
-
+	const formFields = [ 'day', 'country', 'population', 'new' ];
+	const selectedDay = new Date(details.day);
+	const content = formFields.map((field) => {
 		return (
-			<tr key={ idx }>
-				<td className={ DetailsStyle.detailLabel }>
-					{ label }
+			<tr key={field}>
+				<td className={DetailsStyle.detailLabel}>
+					{field}
 				</td>
-				<td>
-					{ value }
-				</td>
+				{(field === 'day') && ('day' in details)
+					? (<td className={DetailsStyle.pickerWrap}>
+						<DatePicker selected={selectedDay} onChange={(date) => setNewDate(date)}/>
+					</td>)
+					: (<td>
+						{((field === 'new' && 'cases' in details)) ? details.cases[field] : details[field]}
+					</td>)
+				}
 			</tr>
 		);
 	});
@@ -141,9 +94,7 @@ const Details = observer(({ showDetails, countryData, closeDetails }) => {
 });
 
 Details.propTypes = {
-	showDetails: PropTypes.bool,
-	country: PropTypes.string,
-	closeDetails: PropTypes.func,
+	selectedCountry: PropTypes.string,
 }
 
 export default Details;

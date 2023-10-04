@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { observer } from 'mobx-react-lite';
-// import TableRow from './TableRow.js';
 import Modal from "./Modal.js";
 import Loader from './Loader.js';
 import Error from './Error.js';
@@ -10,27 +9,22 @@ import { getCovidDataByCountry, setCovidDataToSiblings } from '../utils/countryH
 import TableStyle from '../styles/covtable.module.css';
 
 const TableData = observer(() => {
-	// let countryContent;
-	// let siblingsContent;
-	// const [ countryDetails, setCountryDetails ] = useState({});
-	// const [ siblingsDetails, setSiblingsDetails ] = useState([]);
-	const [ selectedCountry, setSelectedCountryData ] = useState({});
+	const [ selectedCountry, setSelectedCountry ] = useState('');
 	const [ isShowDetails, setIsShowDetails ] = useState(false);
-	// let countryTableRow;
-	// let siblingsTableRows;
 	const { countryName } = country.countryGeoData;
-	console.log('geo data: ', countryName);
 
 	if ((country.status === 'error') || !countryName) {
 		return <Error error={ country.error } />
 	}
 
-	function toggleModal(selectedCountryData) {
-		console.log('00: ', selectedCountryData);
-		setSelectedCountryData(selectedCountryData);
-		setIsShowDetails(!!selectedCountryData);
-		console.log('0: ', isShowDetails);
-		console.log('1: ', selectedCountry);
+	function closeModal() {
+		setSelectedCountry('');
+		setIsShowDetails(false);
+	}
+
+	function openModal(selectedCountry) {
+		setSelectedCountry(selectedCountry.toLowerCase());
+		setIsShowDetails(true);
 	}
 
 	const countryDetails = getCovidDataByCountry(countryName);
@@ -42,18 +36,15 @@ const TableData = observer(() => {
 		</td>
 		<td>{ countryDetails.population }</td>
 		<td
-			onClick={ () => toggleModal(countryDetails) }
+			onClick={ () => openModal(countryName) }
 			title='Click for Details'
 		>
 			{ countryDetails.cases.new || 'n/a' }
 		</td>
 		<td>{ countryDetails.deaths.total || 0 } ({ countryDetails.deaths.new || 0 })</td>
 	</tr>);
-	console.log('details: ', countryDetails);
-	// setCountryDetails(countryCovidItems);
 
 	const siblingsContent = setCovidDataToSiblings();
-	// setSiblingsDetails(siblingsCovidItems);
 
 	return (
 		<div>
@@ -78,22 +69,22 @@ const TableData = observer(() => {
 						<tr className={ TableStyle.tabHeader }>
 							<td colSpan={6}>Siblings Data</td>
 						</tr>
-						{ siblingsContent.map((sibling) => {
+						{ siblingsContent.map(({ country, continent, day, population, cases, deaths }) => {
 							return (
-								<tr key={ sibling.country }>
-									<td>{ sibling.continent }</td>
-									<td>{ sibling.day }</td>
+								<tr key={ country }>
+									<td>{ continent }</td>
+									<td>{ day }</td>
 									<td>
-										{ sibling.country }
+										{ country }
 									</td>
-									<td>{ sibling.population }</td>
+									<td>{ population }</td>
 									<td
-										onClick={ () => toggleModal(sibling) }
+										onClick={ () => openModal(country) }
 										title='Click for Details'
 									>
-										{ sibling.cases.new || 'n/a' }
+										{ cases.new || 'n/a' }
 									</td>
-									<td>{ sibling.deaths.total } ({ sibling.deaths.new || 0 })</td>
+									<td>{ deaths.total } ({ deaths.new || 0 })</td>
 								</tr>)
 						})
 						}
@@ -102,9 +93,9 @@ const TableData = observer(() => {
 			}
 
 			<Modal
-				showDetails = { isShowDetails }
-				countryData = { selectedCountry }
-				closeDetails = { toggleModal }
+				isShowModalContent = { isShowDetails }
+				closeModal = { closeModal }
+				selectedCountry={ selectedCountry }
 			/>
 		</div>
 	)

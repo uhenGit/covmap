@@ -8,18 +8,19 @@ const Modal = ({ isShowModalContent, closeModal, selectedCountry }) => {
 	const outerStyle = isShowModalContent
 		? `${ModalStyle.outer} ${ModalStyle.active}`
 		: `${ModalStyle.outer}`;
+
 	return (
 		<div className={ outerStyle }>
 			<div className={ ModalStyle.inner }>
 				<button
 					className={ ModalStyle.closeBtn }
-					onClick={ () => closeModal(null) }
+					onClick={ closeModal }
 				>
 					close
 				</button>
 				{
 					isShowModalContent
-						? <Details countryData = { selectedCountry }/>
+						? <Details selectedCountry={ selectedCountry }/>
 						: null
 				}
 			</div>
@@ -30,7 +31,7 @@ const Modal = ({ isShowModalContent, closeModal, selectedCountry }) => {
 Modal.propTypes = {
 	isShowModalContent: PropTypes.bool,
 	closeModal: PropTypes.func,
-	selectedCountry: PropTypes.object,
+	selectedCountry: PropTypes.string,
 }
 
 export default Modal;
