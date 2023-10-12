@@ -64,6 +64,8 @@ class Covid {
 	}
 
 	async getCovidDataByDay(country, date) {
+		this.#setStatus('in-progress');
+
 		try {
 			const res = await fetch(
 				`https://covid-193.p.rapidapi.com/history?country=${country}&day=${date}`,
@@ -78,12 +80,17 @@ class Covid {
 			const { response, errors } = await res.json();
 
 			if (errors.length > 0 || response.length === 0) {
+				this.#setStatus('error');
+
 				return { errorMsg: 'No data from the API' };
 			}
+
+			this.#setStatus('done');
 
 			return response[0];
 		}
 		catch (err) {
+			this.#setStatus('error');
 			throw new Error('Covid data by day request error');
 		}
 	}

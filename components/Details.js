@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from "prop-types";
-import { autorun } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import DatePicker from 'react-datepicker';
 import Error from "./Error";
+import Loader from "./Loader";
 import covid from '../store/covStore.js';
-import { formatDateToISOString } from '../utils/dateHandler';
+import { formatDateToISOString } from '../utils/dateHandler.js';
 
 import TableStyle from '../styles/covtable.module.css';
 import DetailsStyle from '../styles/details.module.css';
@@ -17,10 +17,9 @@ async function getFormDetails(selectedCountry, date = null) {
 		: covid.covidData.find(({ country }) => country.toLowerCase() === selectedCountry);
 
 	if (countryCovidDataByDay && Object.keys(countryCovidDataByDay).length > 0 && ('errorMsg' in countryCovidDataByDay)) {
-		// @todo handle this case in the details table
 		return {
-			label: 'Select another date',
-			value: date,
+			field: 'Select another date',
+			day: date,
 			empty: true,
 		};
 	}
@@ -28,8 +27,7 @@ async function getFormDetails(selectedCountry, date = null) {
 	return countryCovidDataByDay;
 }
 
-//@ todo double check 'observer' || autorun usability
-const Details = observer(({ selectedCountry }) => {
+const Details = ({ selectedCountry }) => {
 	const [ details, setDetails ] = useState({});
 	useEffect(() => {
 		getFormDetails(selectedCountry)
@@ -60,25 +58,44 @@ const Details = observer(({ selectedCountry }) => {
 		);
 	}
 
+	if (covid.status === 'in-progress') {
+		return (
+			<div className={'flex f-center'}>
+				<Loader spinDiameter={ 30 }/>
+			</div>
+		)
+	}
+
 	const formFields = [ 'day', 'country', 'population', 'new' ];
 	const selectedDay = new Date(details.day);
-	const content = formFields.map((field) => {
-		return (
-			<tr key={field}>
+	const content = details.empty
+		? (
+			<tr>
 				<td className={DetailsStyle.detailLabel}>
-					{field}
+					{ details.field }
 				</td>
-				{(field === 'day') && ('day' in details)
-					? (<td className={DetailsStyle.pickerWrap}>
-						<DatePicker selected={selectedDay} onChange={(date) => setNewDate(date)}/>
-					</td>)
-					: (<td>
-						{((field === 'new' && 'cases' in details)) ? details.cases[field] : details[field]}
-					</td>)
-				}
+				<td className={DetailsStyle.pickerWrap}>
+					<DatePicker selected={selectedDay} onChange={(date) => setNewDate(date)}/>
+				</td>
 			</tr>
-		);
-	});
+		)
+		: formFields.map((field) => {
+			return (
+				<tr key={field}>
+					<td className={DetailsStyle.detailLabel}>
+						{field}
+					</td>
+					{(field === 'day') && ('day' in details)
+						? (<td className={DetailsStyle.pickerWrap}>
+							<DatePicker selected={selectedDay} onChange={(date) => setNewDate(date)}/>
+						</td>)
+						: (<td>
+							{((field === 'new' && 'cases' in details)) ? details.cases[field] : details[field]}
+						</td>)
+					}
+				</tr>
+			);
+		});
 
 	return (
 		<div className={ 'flex f-column f-center' }>
@@ -91,10 +108,10 @@ const Details = observer(({ selectedCountry }) => {
 			</table>
 		</div>
 	)
-});
+};
 
 Details.propTypes = {
 	selectedCountry: PropTypes.string,
 }
 
-export default Details;
+export default observer(Details);

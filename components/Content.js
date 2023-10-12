@@ -13,7 +13,7 @@ const Content = observer(() => {
 	const [ activeTab, setActiveTab ] = useState('table');
 
 	if ((covid.covidData.length === 0) || !('geonameId' in { ...country.countryGeoData })) {
-		return <Loader spinDiameter={50}/>;
+		return <Loader spinDiameter={ 50 }/>;
 	}
 
 	const handleInput = (evt) => {

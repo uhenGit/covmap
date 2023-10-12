@@ -49,7 +49,7 @@ const TableData = observer(() => {
 	return (
 		<div>
 			{ country.isLoading
-				? <Loader spinDiameter={30}/>
+				? <Loader spinDiameter={ 30 }/>
 				:	<table className={ TableStyle.covTable }>
 					<thead>
 						<tr>
