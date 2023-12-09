@@ -58,12 +58,12 @@ class Country {
 	}
 
 	/** 
-   * Get current coordinates from the browser api or use the default
-   * if the user deny access to the location in a browser, use the second parameter of getCurrentPosition()
+   * Get current coordinates from the browser api or use the default.
+   * If the user deny access to the location in a browser
+	 * (or some browsers do not support the location api),
+	 * use the error callback in the getCurrentPosition()
    */
 	getCurrentCoords() {
-		// let selectedCountry;
-
 		if (navigator.geolocation) {
 			this.#setStatus('in-progress');
 			navigator.geolocation.getCurrentPosition(

@@ -69,24 +69,25 @@ const TableData = observer(() => {
 						<tr className={ TableStyle.tabHeader }>
 							<td colSpan={6}>Siblings Data</td>
 						</tr>
-						{ siblingsContent.map(({ country, continent, day, population, cases, deaths }) => {
-							return (
-								<tr key={ country }>
-									<td>{ continent }</td>
-									<td>{ day }</td>
-									<td>
-										{ country }
-									</td>
-									<td>{ population }</td>
-									<td
-										onClick={ () => openModal(country) }
-										title='Click for Details'
-									>
-										{ cases.new || 'n/a' }
-									</td>
-									<td>{ deaths.total } ({ deaths.new || 0 })</td>
-								</tr>)
-						})
+						{
+							siblingsContent.map(({ country, continent, day, population, cases, deaths }) => {
+								return (
+									<tr key={ country }>
+										<td>{ continent }</td>
+										<td>{ day }</td>
+										<td>
+											{ country }
+										</td>
+										<td>{ population }</td>
+										<td
+											onClick={ () => openModal(country) }
+											title='Click for Details'
+										>
+											{ cases.new || 'n/a' }
+										</td>
+										<td>{ deaths.total } ({ deaths.new || 0 })</td>
+									</tr>)
+							})
 						}
 					</tbody>
 				</table>

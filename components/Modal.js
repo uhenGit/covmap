@@ -20,7 +20,10 @@ const Modal = ({ isShowModalContent, closeModal, selectedCountry }) => {
 				</button>
 				{
 					isShowModalContent
-						? <Details selectedCountry={ selectedCountry }/>
+						? <Details
+							selectedCountry={ selectedCountry }
+							closeModal={ closeModal }
+						/>
 						: null
 				}
 			</div>

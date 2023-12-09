@@ -23,3 +23,11 @@
 	border-radius: 3px;
 	border-color: rgb(250, 250, 250);
 }
+.setBtn {
+	cursor: pointer;
+	width: 20%;
+	transition-duration: 500ms;
+	align-self: start;
+	margin: 1rem;
+	padding: 0.25rem;
+}

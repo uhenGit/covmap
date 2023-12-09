@@ -80,7 +80,7 @@ class Covid {
 			const { response, errors } = await res.json();
 
 			if (errors.length > 0 || response.length === 0) {
-				this.#setStatus('error');
+				this.#setStatus('done');
 
 				return { errorMsg: 'No data from the API' };
 			}
