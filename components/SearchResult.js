@@ -8,7 +8,7 @@ import SearchResStyle from '../styles/searchres.module.css';
 
 const SearchResult = ({ onSelect }) => {
 	if (country.isLoading) {
-		return <Loader spinDiameter={30}/>;
+		return <Loader spinDiameter={ 30 }/>;
 	}
 
 	return(

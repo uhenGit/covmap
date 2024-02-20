@@ -4,7 +4,6 @@ import { COV_API_KEY } from '../keys.js';
 class Covid {
 	constructor() {
 		this.covData = observable.array([]);
-		this.covDataByDay = observable.array([]);
 		this.loadCovidDataStatus = observable.box('');
 		this.loadCovidDataError = observable.box({});
 	}
@@ -40,16 +39,6 @@ class Covid {
 
 	get error() {
 		return this.loadCovidDataError.get();
-	}
-
-	get covidDataByDay() {
-		return toJS(this.covDataByDay);
-	}
-
-	dropDataByDay() {
-		runInAction(() => {
-			this.covDataByDay.clear();
-		})
 	}
 
 	async getCovidData() {
@@ -88,22 +77,23 @@ class Covid {
 					}
 				},
 			);
-			const { response } = await res.json();
+			const { response, errors } = await res.json();
 
-			if (response.length !== 0) {
-				runInAction(() => {
-					this.covDataByDay.replace(response);
-				});
+			if (errors.length > 0 || response.length === 0) {
 				this.#setStatus('done');
-			} else {
-				this.#setError({ message: 'No cov data. Maybe You want to see future' });
+
+				return { errorMsg: 'No data from the API' };
 			}
+
+			this.#setStatus('done');
+
+			return response[0];
 		}
 		catch (err) {
-			this.#setError(err);
+			this.#setStatus('error');
+			throw new Error('Covid data by day request error');
 		}
 	}
 }
 
 export default new Covid();
-

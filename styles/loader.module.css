@@ -1,7 +1,9 @@
 .loaderWrapper {
     display: block;
     margin: 0 auto;
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
 }
 
 .spin1, .spin2 {

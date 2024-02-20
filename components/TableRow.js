@@ -10,7 +10,7 @@ const TableRow = ({ data }) => {
 
 	function showDetails(evt) {
 		User.toggleShow();
-		User.setDetales(evt);
+		User.setDetails(evt);
 	}
 
 	async function setToMain(currentCountry) {
@@ -24,7 +24,7 @@ const TableRow = ({ data }) => {
 			return;
 		}
 
-		await country.setCountry(selectedSibling);
+		// await country.setCountry(selectedSibling);
 	}
 
 	return (data.map((item) => {
@@ -39,6 +39,7 @@ const TableRow = ({ data }) => {
 					<td colSpan={5}>{ item.error.message }</td>
 				</tr>)
 		}
+
 		return (
 			<tr key={ item.country }>
 				<td>{ item.continent }</td>

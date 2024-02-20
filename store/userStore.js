@@ -14,15 +14,15 @@ class User {
 	isShow() {
 		return toJS(this.showDetails);
 	}
-	setDetales(data) {
+	setDetails(data) {
 		runInAction(() => {
 			this.details = data;
 		})
 	}
-	getDetales() {
+	getDetails() {
 		return this.details;
 	}
-	dropDetales() {
+	dropDetails() {
 		runInAction(() => {
 			this.details = '';
 		})

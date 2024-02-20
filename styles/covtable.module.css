@@ -1,8 +1,7 @@
 .covTable {
-	width: 80%;
+	min-width: 80%;
 }
 .covTable tr {
-	cursor: pointer;
 	transition-duration: 300ms;
 }
 .covTable tr:nth-child(even) {
@@ -16,7 +15,7 @@
 }
 .covTable tr td,
 .covTable tr th {
-	padding: 0.5rem 0;
+	padding: 0.5rem;
 	text-align: center;
 }
 .tabHeader td {
